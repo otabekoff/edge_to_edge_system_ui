@@ -1,0 +1,16 @@
+name: edge_to_edge_system_ui_example
+description: Example app demonstrating the edge_to_edge_system_ui plugin.
+publish_to: none
+version: 0.0.1
+
+environment:
+  sdk: ">=2.18.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  edge_to_edge_system_ui:
+    path: ..
+
+flutter:
+  uses-material-design: true

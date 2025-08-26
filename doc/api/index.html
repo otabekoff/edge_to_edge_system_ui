@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
+  <meta name="description" content="edge_to_edge_system_ui API docs, for the Dart programming language.">
+  <title>edge_to_edge_system_ui - Dart API docs</title>
+
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+  
+  <link rel="stylesheet" href="static-assets/github.css?v1">
+  <link rel="stylesheet" href="static-assets/styles.css?v1">
+  <link rel="icon" href="static-assets/favicon.png?v1">
+  
+</head>
+
+<body data-base-href="" data-using-base-href="false" class="light-theme">
+<div id="overlay-under-drawer"></div>
+<header id="title">
+  <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li><a href="https://pub.dev/documentation/edge_to_edge_system_ui/latest/">edge_to_edge_system_ui package</a></li>
+  </ol>
+  <div class="self-name">edge_to_edge_system_ui</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+  <button class="toggle" id="theme-button" title="Toggle between light and dark mode" aria-label="Light and dark mode toggle">
+    <span id="dark-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      dark_mode
+    </span>
+    <span id="light-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      light_mode
+    </span>
+  </button>
+</header>
+<main>
+  <div id="dartdoc-main-content" class="main-content">
+      
+<section class="desc markdown">
+  <h1 id="edge_to_edge_system_ui">edge_to_edge_system_ui</h1>
+<p>A small Flutter plugin that exposes an Android Kotlin implementation to control edge-to-edge system UI (status/navigation bars) and surface insets. Designed as a lightweight plugin suitable for inclusion on pub.dev.</p>
+<p>Features</p>
+<ul>
+<li>Query system inset sizes and whether edge-to-edge mode is enabled</li>
+<li>Enable/disable edge-to-edge at runtime</li>
+<li>Apply status/navigation bar colors and icon brightness</li>
+</ul>
+<p>Usage</p>
+<ol>
+<li>Add the plugin to your pubspec (local or on pub.dev)</li>
+<li>Call <code>EdgeToEdgeSystemUIKotlin.instance.initialize()</code> on app startup</li>
+<li>Use <code>getSystemInfo()</code>, <code>enableEdgeToEdge()</code>, <code>disableEdgeToEdge()</code> and <code>setSystemUIStyle(...)</code> as needed.</li>
+</ol>
+<p>Example code is included in the <code>example/</code> folder.</p>
+<h2 id="quick-start">Quick start</h2>
+<p>Add the package to <code>pubspec.yaml</code> (when published):</p>
+<pre class="language-yaml"><code class="language-yaml">dependencies:
+	edge_to_edge_system_ui: ^0.1.0
+</code></pre>
+<p>Initialize and query system info:</p>
+<pre class="language-dart"><code class="language-dart">await EdgeToEdgeSystemUIKotlin.instance.initialize();
+final info = await EdgeToEdgeSystemUIKotlin.instance.getSystemInfo();
+print('Navigation bar height: ${info.navigationBarsHeight} dp');
+</code></pre>
+<p>See <code>example/</code> for a runnable demo.</p>
+<p>Publishing</p>
+<ul>
+<li>Update <code>publish_to</code> in <code>pubspec.yaml</code> to point to <code>https://pub.dev</code>.</li>
+<li>Run <code>flutter pub publish --dry-run</code> and <code>flutter pub publish</code> when ready.</li>
+</ul>
+<p>Notes</p>
+<ul>
+<li>The plugin only implements Android in Kotlin currently. iOS and other platforms are no-ops.</li>
+<li>The plugin returns inset sizes in logical pixels (dp) to match Flutter's <code>MediaQuery</code>.</li>
+</ul>
+<h2 id="changelog">Changelog</h2>
+<p>See <code>CHANGELOG.md</code> for recent changes and version history.</p>
+<h3 id="optional-debugging-flag">Optional Debugging Flag</h3>
+<p>During development, you may want to prevent the screen from turning off. Add the following code to your <code>MainActivity</code>:</p>
+<pre class="language-kotlin"><code class="language-kotlin">val isDebuggable = (application?.applicationInfo?.flags ?: 0) and
+    android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE != 0
+if (isDebuggable) {
+    window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+}
+</code></pre>
+<p>This ensures the screen stays on while the app is running in debug mode.</p>
+<h3 id="androidmanifest-configuration">AndroidManifest Configuration</h3>
+<p>To ensure proper edge-to-edge functionality and compatibility with Android 13+ features, you may need to update your <code>AndroidManifest.xml</code> file.</p>
+<ol>
+<li>
+<p><strong>Edge-to-Edge Enforcement (Android 13+):</strong>
+Add the following attribute to the <code>&lt;application&gt;</code> tag to ensure edge-to-edge behavior is enforced:</p>
+<pre class="language-xml"><code class="language-xml">android:windowOptOutEdgeToEdgeEnforcement="false"
+</code></pre>
+</li>
+<li>
+<p><strong>Back Navigation Compatibility (Android 13+):</strong>
+Add the following attribute to the <code>&lt;application&gt;</code> tag to enable the new back navigation behavior:</p>
+<pre class="language-xml"><code class="language-xml">android:enableOnBackInvokedCallback="true"
+</code></pre>
+</li>
+<li>
+<p><strong>Optional Permission for System Overlays:</strong>
+If your app requires system-level overlays (e.g., floating windows), add the following permission before the <code>&lt;application&gt;</code> tag:</p>
+<pre class="language-xml"><code class="language-xml">&lt;uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" /&gt;
+</code></pre>
+</li>
+</ol>
+<p>These configurations are optional but recommended for apps targeting Android 13+ to ensure consistent behavior and compatibility.</p>
+</section>
+
+
+      <section class="summary">
+          <h2>Libraries</h2>
+        <dl>
+          <dt id="edge_to_edge_system_ui">
+  <span class="name"><a href="edge_to_edge_system_ui/">edge_to_edge_system_ui</a></span> 
+
+</dt>
+<dd>Edge-to-edge system UI utilities for Android.
+</dd>
+
+          <dt id="edge_to_edge_system_ui_kotlin">
+  <span class="name"><a href="edge_to_edge_system_ui_kotlin/">edge_to_edge_system_ui_kotlin</a></span> 
+
+</dt>
+<dd>
+</dd>
+
+          <dt id="system_info">
+  <span class="name"><a href="system_info/">system_info</a></span> 
+
+</dt>
+<dd>
+</dd>
+
+        </dl>
+      </section>
+  </div> <!-- /.main-content -->
+  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+    <!-- The search input and breadcrumbs below are only responsively visible at low resolutions. -->
+<header id="header-search-sidebar" class="hidden-l">
+  <form class="search-sidebar" role="search">
+    <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+<ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
+    <li><a href="https://pub.dev/documentation/edge_to_edge_system_ui/latest/">edge_to_edge_system_ui package</a></li>
+</ol>
+
+    <h5 class="hidden-xs"><span class="package-name">edge_to_edge_system_ui</span> <span class="package-kind">package</span></h5>
+    <ol>
+      <li class="section-title">Libraries</li>
+      <li><a href="edge_to_edge_system_ui/">edge_to_edge_system_ui</a></li>
+      <li><a href="edge_to_edge_system_ui_kotlin/">edge_to_edge_system_ui_kotlin</a></li>
+      <li><a href="system_info/">system_info</a></li>
+</ol>
+
+  </div>
+  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+  </div>
+</main>
+<footer>
+  <span class="no-break">
+    edge_to_edge_system_ui
+      0.1.0-dev.2
+  </span>
+  
+</footer>
+
+
+<script src="static-assets/highlight.pack.js?v1"></script>
+<script src="static-assets/docs.dart.js"></script>
+
+</body>
+</html>
+

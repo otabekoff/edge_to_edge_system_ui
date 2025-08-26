@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
+  <meta name="description" content="API docs for the EdgeToEdgeSystemUIKotlin class from the edge_to_edge_system_ui_kotlin library, for the Dart programming language.">
+  <title>EdgeToEdgeSystemUIKotlin class - edge_to_edge_system_ui_kotlin library - Dart API</title>
+
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../static-assets/github.css?v1">
+  <link rel="stylesheet" href="../static-assets/styles.css?v1">
+  <link rel="icon" href="../static-assets/favicon.png?v1">
+  
+</head>
+
+<body data-base-href="../" data-using-base-href="false" class="light-theme">
+<div id="overlay-under-drawer"></div>
+<header id="title">
+  <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li><a href="../index.html">edge_to_edge_system_ui</a></li>
+    <li><a href="../edge_to_edge_system_ui_kotlin/">edge_to_edge_system_ui_kotlin.dart</a></li>
+    <li class="self-crumb">EdgeToEdgeSystemUIKotlin class</li>
+  </ol>
+  <div class="self-name">EdgeToEdgeSystemUIKotlin</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+  <button class="toggle" id="theme-button" title="Toggle between light and dark mode" aria-label="Light and dark mode toggle">
+    <span id="dark-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      dark_mode
+    </span>
+    <span id="light-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      light_mode
+    </span>
+  </button>
+</header>
+<main>
+<div
+    id="dartdoc-main-content"
+    class="main-content"
+    data-above-sidebar="edge_to_edge_system_ui_kotlin&#47;edge_to_edge_system_ui_kotlin-library-sidebar.html"
+    data-below-sidebar="edge_to_edge_system_ui_kotlin&#47;EdgeToEdgeSystemUIKotlin-class-sidebar.html">
+    <div>
+<h1><span class="kind-class">EdgeToEdgeSystemUIKotlin</span> class 
+ 
+</h1></div>
+
+    
+<section class="desc markdown">
+  <p>A small wrapper around the Kotlin plugin exposed via MethodChannel.</p>
+<p>Example usage:</p>
+<pre class="language-dart"><code class="language-dart">await EdgeToEdgeSystemUIKotlin.instance.initialize();
+final info = await EdgeToEdgeSystemUIKotlin.instance.getSystemInfo();
+print('Nav height: ${info.navigationBarsHeight}');
+</code></pre>
+<p>A singleton class that provides methods to control edge-to-edge system UI.</p>
+<p>This class communicates with the native Android plugin via a MethodChannel.
+It provides methods to initialize the plugin, enable/disable edge-to-edge mode,
+retrieve system information, and customize the system UI style.</p>
+</section>
+
+
+
+    
+    
+  <section
+      class="summary offset-anchor"
+      id="instance-properties">
+    <h2>Properties</h2>
+    <dl class="properties">
+        <dt id="hashCode" class="property inherited">
+  <span class="name"><a href="https://api.flutter.dev/flutter/dart-core/Object/hashCode.html">hashCode</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span>
+  
+
+</dt>
+<dd class="inherited">
+  The hash code for this object.
+  <div class="features"><span class="feature">no setter</span><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="isEdgeToEdgeEnabled" class="property">
+  <span class="name"><a href="../edge_to_edge_system_ui_kotlin/EdgeToEdgeSystemUIKotlin/isEdgeToEdgeEnabled.html">isEdgeToEdgeEnabled</a></span>
+  <span class="signature">&#8596; <a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span>
+  
+
+</dt>
+<dd>
+  Cached value from the last initialization/refresh indicating whether
+edge-to-edge mode is currently enabled.
+  <div class="features"><span class="feature">getter/setter pair</span></div>
+
+</dd>
+
+        <dt id="isEdgeToEdgeSupported" class="property">
+  <span class="name"><a href="../edge_to_edge_system_ui_kotlin/EdgeToEdgeSystemUIKotlin/isEdgeToEdgeSupported.html">isEdgeToEdgeSupported</a></span>
+  <span class="signature">&#8596; <a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span>
+  
+
+</dt>
+<dd>
+  Whether the device supports edge-to-edge (as determined by the plugin).
+  <div class="features"><span class="feature">getter/setter pair</span></div>
+
+</dd>
+
+        <dt id="runtimeType" class="property inherited">
+  <span class="name"><a href="https://api.flutter.dev/flutter/dart-core/Object/runtimeType.html">runtimeType</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a></span>
+  
+
+</dt>
+<dd class="inherited">
+  A representation of the runtime type of the object.
+  <div class="features"><span class="feature">no setter</span><span class="feature">inherited</span></div>
+
+</dd>
+
+    </dl>
+  </section>
+
+    
+  <section
+      class="summary offset-anchor"
+      id="instance-methods">
+    <h2>Methods</h2>
+    <dl class="callables">
+        <dt id="disableEdgeToEdge" class="callable">
+  <span class="name"><a href="../edge_to_edge_system_ui_kotlin/EdgeToEdgeSystemUIKotlin/disableEdgeToEdge.html">disableEdgeToEdge</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Disable edge-to-edge mode on the device (Android).
+  
+
+</dd>
+
+        <dt id="enableEdgeToEdge" class="callable">
+  <span class="name"><a href="../edge_to_edge_system_ui_kotlin/EdgeToEdgeSystemUIKotlin/enableEdgeToEdge.html">enableEdgeToEdge</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Enable edge-to-edge mode on the device (Android).
+  
+
+</dd>
+
+        <dt id="getSystemInfo" class="callable">
+  <span class="name"><a href="../edge_to_edge_system_ui_kotlin/EdgeToEdgeSystemUIKotlin/getSystemInfo.html">getSystemInfo</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../system_info/SystemInfo-class.html">SystemInfo</a></span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Returns a typed <a href="../system_info/SystemInfo-class.html">SystemInfo</a> object describing system insets and
+platform details.
+  
+
+</dd>
+
+        <dt id="initialize" class="callable">
+  <span class="name"><a href="../edge_to_edge_system_ui_kotlin/EdgeToEdgeSystemUIKotlin/initialize.html">initialize</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Initialize the plugin and cache a quick snapshot of supported/enabled.
+  
+
+</dd>
+
+        <dt id="noSuchMethod" class="callable inherited">
+  <span class="name"><a href="https://api.flutter.dev/flutter/dart-core/Object/noSuchMethod.html">noSuchMethod</a></span><span class="signature">(<wbr><span class="parameter" id="noSuchMethod-param-invocation"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Invocation-class.html">Invocation</a></span> <span class="parameter-name">invocation</span></span>)
+    <span class="returntype parameter">&#8594; dynamic</span>
+  </span>
+  
+
+</dt>
+<dd class="inherited">
+  Invoked when a nonexistent method or property is accessed.
+  <div class="features"><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="setSystemUIStyle" class="callable">
+  <span class="name"><a href="../edge_to_edge_system_ui_kotlin/EdgeToEdgeSystemUIKotlin/setSystemUIStyle.html">setSystemUIStyle</a></span><span class="signature">(<wbr>{<span class="parameter" id="setSystemUIStyle-param-statusBarColor"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">statusBarColor</span>, </span><span class="parameter" id="setSystemUIStyle-param-navigationBarColor"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">navigationBarColor</span>, </span><span class="parameter" id="setSystemUIStyle-param-statusBarLight"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">statusBarLight</span>, </span><span class="parameter" id="setSystemUIStyle-param-navigationBarLight"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">navigationBarLight</span></span>})
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Apply colors and appearance to the status and navigation bars.
+  
+
+</dd>
+
+        <dt id="toString" class="callable inherited">
+  <span class="name"><a href="https://api.flutter.dev/flutter/dart-core/Object/toString.html">toString</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>
+  </span>
+  
+
+</dt>
+<dd class="inherited">
+  A string representation of this object.
+  <div class="features"><span class="feature">inherited</span></div>
+
+</dd>
+
+    </dl>
+  </section>
+    
+  <section
+      class="summary offset-anchor inherited"
+      id="operators">
+    <h2>Operators</h2>
+    <dl class="callables">
+        <dt id="operator ==" class="callable inherited">
+  <span class="name"><a href="https://api.flutter.dev/flutter/dart-core/Object/operator_equals.html">operator ==</a></span><span class="signature">(<wbr><span class="parameter" id="==-param-other"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Object-class.html">Object</a></span> <span class="parameter-name">other</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span>
+  </span>
+  
+
+</dt>
+<dd class="inherited">
+  The equality operator.
+  <div class="features"><span class="feature">inherited</span></div>
+
+</dd>
+
+    </dl>
+  </section>
+    
+  <section class="summary offset-anchor" id="static-properties">
+    <h2>Static Properties</h2>
+    <dl class="properties">
+        <dt id="instance" class="property">
+  <span class="name"><a href="../edge_to_edge_system_ui_kotlin/EdgeToEdgeSystemUIKotlin/instance.html">instance</a></span>
+  <span class="signature">&#8594; <a href="../edge_to_edge_system_ui_kotlin/EdgeToEdgeSystemUIKotlin-class.html">EdgeToEdgeSystemUIKotlin</a></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">final</span></div>
+
+</dd>
+
+    </dl>
+  </section>
+    
+    
+
+  </div> <!-- /.main-content -->
+  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+    <!-- The search input and breadcrumbs below are only responsively visible at low resolutions. -->
+<header id="header-search-sidebar" class="hidden-l">
+  <form class="search-sidebar" role="search">
+    <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+<ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
+    <li><a href="../index.html">edge_to_edge_system_ui</a></li>
+    <li><a href="../edge_to_edge_system_ui_kotlin/">edge_to_edge_system_ui_kotlin</a></li>
+    <li class="self-crumb">EdgeToEdgeSystemUIKotlin class</li>
+</ol>
+
+    <h5>edge_to_edge_system_ui_kotlin library</h5>
+    <div id="dartdoc-sidebar-left-content"></div>
+  </div>
+  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+  </div><!--/.sidebar-offcanvas-->
+</main>
+<footer>
+  <span class="no-break">
+    edge_to_edge_system_ui
+      0.1.0-dev.2
+  </span>
+  
+</footer>
+
+
+<script src="../static-assets/highlight.pack.js?v1"></script>
+<script src="../static-assets/docs.dart.js"></script>
+
+</body>
+</html>
+
