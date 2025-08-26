@@ -1,6 +1,6 @@
 name: edge_to_edge_system_ui
 description: Flutter plugin providing an opinionated Edge-to-Edge system UI controller with a Kotlin implementation for Android.
-version: 0.1.0-dev.2
+version: 0.1.0-dev.3
 homepage: https://pub.dev/documentation/edge_to_edge_system_ui/latest/
 repository: https://github.com/otabekoff/edge_to_edge_system_ui
 environment:
