@@ -64,6 +64,13 @@
 <p>Provides a small, typed Dart API backed by a Kotlin plugin to query
 system insets, enable/disable edge-to-edge behavior, and set system bar
 colors. See the <code>example/</code> folder for a runnable example.</p>
+<p>Version 0.1.0-dev.3 includes:</p>
+<ul>
+<li>Enhanced API with convenience methods for common use cases</li>
+<li>Flutter-friendly parameter types (Color objects, Brightness enum)</li>
+<li>Wrapper widgets for automatic configuration and safe areas</li>
+<li>Utility functions for Android version mapping</li>
+</ul>
 </section>
 
 
@@ -75,7 +82,24 @@ colors. See the <code>example/</code> folder for a runnable example.</p>
 
 </dt>
 <dd>
-  A small wrapper around the Kotlin plugin exposed via MethodChannel.
+  A Dart wrapper around the native Kotlin plugin for controlling Edge-to-Edge
+system UI on Android.
+</dd>
+
+          <dt id="KotlinEdgeToEdgeSafeArea">
+  <span class="name "><a href="../edge_to_edge_system_ui_kotlin/KotlinEdgeToEdgeSafeArea-class.html">KotlinEdgeToEdgeSafeArea</a></span> 
+
+</dt>
+<dd>
+  A safe area widget that accounts for system UI insets in edge-to-edge mode.
+</dd>
+
+          <dt id="KotlinSystemUIWrapper">
+  <span class="name "><a href="../edge_to_edge_system_ui_kotlin/KotlinSystemUIWrapper-class.html">KotlinSystemUIWrapper</a></span> 
+
+</dt>
+<dd>
+  A wrapper widget that automatically configures edge-to-edge mode and safe areas.
 </dd>
 
           <dt id="SystemInfo">
@@ -95,6 +119,24 @@ colors. See the <code>example/</code> folder for a runnable example.</p>
 
 
 
+    <section class="summary offset-anchor" id="functions">
+      <h2>Functions</h2>
+      <dl class="callables">
+          <dt id="whenSdk" class="callable">
+  <span class="name"><a href="../edge_to_edge_system_ui_kotlin/whenSdk.html">whenSdk</a></span><span class="signature">(<wbr><span class="parameter" id="whenSdk-param-apiLevel"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">apiLevel</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Utility function to get Android version name from API level.
+  
+
+</dd>
+
+      </dl>
+    </section>
 
 
   </div> <!-- /.main-content -->
@@ -126,7 +168,7 @@ colors. See the <code>example/</code> folder for a runnable example.</p>
 <footer>
   <span class="no-break">
     edge_to_edge_system_ui
-      0.1.0-dev.2
+      0.1.0-dev.4
   </span>
   
 </footer>

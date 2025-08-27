@@ -44,6 +44,10 @@
       
 <section class="desc markdown">
   <h1 id="edge_to_edge_system_ui">edge_to_edge_system_ui</h1>
+<div class="markdown-alert markdown-alert-note">
+<p class="markdown-alert-title">Note</p>
+<p>Useful information that users should know, even when skimming content.</p>
+</div>
 <p>A small Flutter plugin that exposes an Android Kotlin implementation to control edge-to-edge system UI (status/navigation bars) and surface insets. Designed as a lightweight plugin suitable for inclusion on pub.dev.</p>
 <p>Features</p>
 <ul>
@@ -61,7 +65,7 @@
 <h2 id="quick-start">Quick start</h2>
 <p>Add the package to <code>pubspec.yaml</code> (when published):</p>
 <pre class="language-yaml"><code class="language-yaml">dependencies:
-	edge_to_edge_system_ui: ^0.1.0
+	edge_to_edge_system_ui: ^0.1.0-dev.4
 </code></pre>
 <p>Initialize and query system info:</p>
 <pre class="language-dart"><code class="language-dart">await EdgeToEdgeSystemUIKotlin.instance.initialize();
@@ -113,6 +117,40 @@ If your app requires system-level overlays (e.g., floating windows), add the fol
 </li>
 </ol>
 <p>These configurations are optional but recommended for apps targeting Android 13+ to ensure consistent behavior and compatibility.</p>
+<h2 id="compatibility-with-previous-in-app-implementation">Compatibility with previous in-app implementation</h2>
+<p>If you migrated from the older in-app implementation (where the plugin lived under <code>android/app/src</code>), the package exposes legacy helpers to make migration easier:</p>
+<ul>
+<li>Static registration helper: <code>EdgeToEdgeSystemUiPlugin.registerWithEngine(flutterEngine, activity)</code> — call from <code>MainActivity.configureFlutterEngine</code> if you registered explicitly before.</li>
+<li>Legacy method names are supported by the plugin channel: <code>setSystemUIStyle</code>, <code>setNavigationBarStyle</code>, <code>setStatusBarStyle</code>.</li>
+</ul>
+<p>Preferred usage (new package API)</p>
+<p>Use numeric ARGB color values and the compact <code>setStyle</code> method from Dart:</p>
+<pre class="language-dart"><code class="language-dart">await EdgeToEdgeSystemUIKotlin.instance.setStyle(
+  statusBarColor: 0xFF112233, // ARGB int
+  navigationBarColor: 0xFF112233,
+  statusBarLight: true, // true =&gt; light icons in our Dart API (plugin inverts for Android)
+  navigationBarLight: true,
+);
+</code></pre>
+<p>Legacy string-based example (supported for backwards-compatibility):</p>
+<pre class="language-dart"><code class="language-dart">await EdgeToEdgeSystemUIKotlin.instance.invokeLegacy(
+  method: 'setSystemUIStyle',
+  args: {
+    'statusBarColor': '#112233',
+    'navigationBarColor': '#112233',
+    'statusBarIconBrightness': 'dark', // 'dark' means dark icons in legacy API
+    'navigationBarIconBrightness': 'dark',
+  }
+);
+
+## 0.1.0-dev.4 (2025-08-27)
+
+This is a development release containing example improvements and bugfixes:
+
+- Added a "Deep Customize" section in the example app allowing separate control of status bar and navigation bar backgrounds and content brightness.
+- Fixed Color -&gt; ARGB compatibility in the example across Flutter SDKs.
+- Improved example flow and documentation prior to a dev publish.
+</code></pre>
 </section>
 
 
@@ -169,7 +207,7 @@ If your app requires system-level overlays (e.g., floating windows), add the fol
 <footer>
   <span class="no-break">
     edge_to_edge_system_ui
-      0.1.0-dev.2
+      0.1.0-dev.4
   </span>
   
 </footer>

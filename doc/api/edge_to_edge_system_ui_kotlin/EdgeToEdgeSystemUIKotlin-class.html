@@ -54,16 +54,21 @@
 
     
 <section class="desc markdown">
-  <p>A small wrapper around the Kotlin plugin exposed via MethodChannel.</p>
-<p>Example usage:</p>
+  <p>A Dart wrapper around the native Kotlin plugin for controlling Edge-to-Edge
+system UI on Android.</p>
+<p>This singleton exposes a small, typed API that communicates with the
+platform implementation using a <a href="https://api.flutter.dev/flutter/services/MethodChannel-class.html">MethodChannel</a>. Use this class to:</p>
+<ul>
+<li>Initialize the native plugin and read device capabilities.</li>
+<li>Enable/disable edge-to-edge mode at runtime.</li>
+<li>Query system insets and platform information via <a href="../edge_to_edge_system_ui_kotlin/EdgeToEdgeSystemUIKotlin/getSystemInfo.html">getSystemInfo()</a>.</li>
+<li>Apply status/navigation bar colors and icon brightness.</li>
+</ul>
+<p>Example</p>
 <pre class="language-dart"><code class="language-dart">await EdgeToEdgeSystemUIKotlin.instance.initialize();
 final info = await EdgeToEdgeSystemUIKotlin.instance.getSystemInfo();
 print('Nav height: ${info.navigationBarsHeight}');
 </code></pre>
-<p>A singleton class that provides methods to control edge-to-edge system UI.</p>
-<p>This class communicates with the native Android plugin via a MethodChannel.
-It provides methods to initialize the plugin, enable/disable edge-to-edge mode,
-retrieve system information, and customize the system UI style.</p>
 </section>
 
 
@@ -75,6 +80,20 @@ retrieve system information, and customize the system UI style.</p>
       id="instance-properties">
     <h2>Properties</h2>
     <dl class="properties">
+        <dt id="androidApiLevel" class="property">
+  <span class="name"><a href="../edge_to_edge_system_ui_kotlin/EdgeToEdgeSystemUIKotlin/androidApiLevel.html">androidApiLevel</a></span>
+  <span class="signature">&#8596; <a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a>?</span>
+  
+
+</dt>
+<dd>
+  Cached Android API level (if available from plugin). Used to decide
+whether to prefer transparent status bar (Flutter-drawn) or let the
+native plugin paint via the overlay on Android 15+.
+  <div class="features"><span class="feature">getter/setter pair</span></div>
+
+</dd>
+
         <dt id="hashCode" class="property inherited">
   <span class="name"><a href="https://api.flutter.dev/flutter/dart-core/Object/hashCode.html">hashCode</a></span>
   <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span>
@@ -96,6 +115,19 @@ retrieve system information, and customize the system UI style.</p>
 <dd>
   Cached value from the last initialization/refresh indicating whether
 edge-to-edge mode is currently enabled.
+  <div class="features"><span class="feature">getter/setter pair</span></div>
+
+</dd>
+
+        <dt id="isEdgeToEdgeEnforcedBySystem" class="property">
+  <span class="name"><a href="../edge_to_edge_system_ui_kotlin/EdgeToEdgeSystemUIKotlin/isEdgeToEdgeEnforcedBySystem.html">isEdgeToEdgeEnforcedBySystem</a></span>
+  <span class="signature">&#8596; <a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span>
+  
+
+</dt>
+<dd>
+  Whether the OS enforces edge-to-edge (Android 15+). This is separate
+from <code>isEdgeToEdgeEnabled</code> which represents plugin actions.
   <div class="features"><span class="feature">getter/setter pair</span></div>
 
 </dd>
@@ -135,7 +167,7 @@ edge-to-edge mode is currently enabled.
     <dl class="callables">
         <dt id="disableEdgeToEdge" class="callable">
   <span class="name"><a href="../edge_to_edge_system_ui_kotlin/EdgeToEdgeSystemUIKotlin/disableEdgeToEdge.html">disableEdgeToEdge</a></span><span class="signature">(<wbr>)
-    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span>&gt;</span></span>
   </span>
   
 
@@ -148,7 +180,7 @@ edge-to-edge mode is currently enabled.
 
         <dt id="enableEdgeToEdge" class="callable">
   <span class="name"><a href="../edge_to_edge_system_ui_kotlin/EdgeToEdgeSystemUIKotlin/enableEdgeToEdge.html">enableEdgeToEdge</a></span><span class="signature">(<wbr>)
-    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span>&gt;</span></span>
   </span>
   
 
@@ -199,6 +231,45 @@ platform details.
 
 </dd>
 
+        <dt id="setDarkSystemUI" class="callable">
+  <span class="name"><a href="../edge_to_edge_system_ui_kotlin/EdgeToEdgeSystemUIKotlin/setDarkSystemUI.html">setDarkSystemUI</a></span><span class="signature">(<wbr>{<span class="parameter" id="setDarkSystemUI-param-transparent"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">transparent</span> = <span class="default-value">false</span></span>})
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Convenience method to set dark system UI with optional transparency.
+  
+
+</dd>
+
+        <dt id="setLightSystemUI" class="callable">
+  <span class="name"><a href="../edge_to_edge_system_ui_kotlin/EdgeToEdgeSystemUIKotlin/setLightSystemUI.html">setLightSystemUI</a></span><span class="signature">(<wbr>{<span class="parameter" id="setLightSystemUI-param-transparent"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">transparent</span> = <span class="default-value">false</span></span>})
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Convenience method to set light system UI with optional transparency.
+  
+
+</dd>
+
+        <dt id="setSystemUIForTheme" class="callable">
+  <span class="name"><a href="../edge_to_edge_system_ui_kotlin/EdgeToEdgeSystemUIKotlin/setSystemUIForTheme.html">setSystemUIForTheme</a></span><span class="signature">(<wbr><span class="parameter" id="setSystemUIForTheme-param-brightness"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-ui/Brightness.html">Brightness</a></span> <span class="parameter-name">brightness</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Set system UI colors based on the current theme brightness.
+  
+
+</dd>
+
         <dt id="setSystemUIStyle" class="callable">
   <span class="name"><a href="../edge_to_edge_system_ui_kotlin/EdgeToEdgeSystemUIKotlin/setSystemUIStyle.html">setSystemUIStyle</a></span><span class="signature">(<wbr>{<span class="parameter" id="setSystemUIStyle-param-statusBarColor"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">statusBarColor</span>, </span><span class="parameter" id="setSystemUIStyle-param-navigationBarColor"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">navigationBarColor</span>, </span><span class="parameter" id="setSystemUIStyle-param-statusBarLight"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">statusBarLight</span>, </span><span class="parameter" id="setSystemUIStyle-param-navigationBarLight"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">navigationBarLight</span></span>})
     <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
@@ -208,6 +279,19 @@ platform details.
 </dt>
 <dd>
   Apply colors and appearance to the status and navigation bars.
+  
+
+</dd>
+
+        <dt id="setSystemUIStyleWithBrightness" class="callable">
+  <span class="name"><a href="../edge_to_edge_system_ui_kotlin/EdgeToEdgeSystemUIKotlin/setSystemUIStyleWithBrightness.html">setSystemUIStyleWithBrightness</a></span><span class="signature">(<wbr>{<span class="parameter" id="setSystemUIStyleWithBrightness-param-statusBarColor"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-ui/Color-class.html">Color</a></span> <span class="parameter-name">statusBarColor</span>, </span><span class="parameter" id="setSystemUIStyleWithBrightness-param-navigationBarColor"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-ui/Color-class.html">Color</a></span> <span class="parameter-name">navigationBarColor</span>, </span><span class="parameter" id="setSystemUIStyleWithBrightness-param-statusBarIconBrightness"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-ui/Brightness.html">Brightness</a></span> <span class="parameter-name">statusBarIconBrightness</span>, </span><span class="parameter" id="setSystemUIStyleWithBrightness-param-navigationBarIconBrightness"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-ui/Brightness.html">Brightness</a></span> <span class="parameter-name">navigationBarIconBrightness</span></span>})
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Convenience method with Flutter-style brightness parameters.
   
 
 </dd>
@@ -292,7 +376,7 @@ platform details.
 <footer>
   <span class="no-break">
     edge_to_edge_system_ui
-      0.1.0-dev.2
+      0.1.0-dev.4
   </span>
   
 </footer>

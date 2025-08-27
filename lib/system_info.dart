@@ -1,7 +1,9 @@
 /// System inset and platform information returned by the plugin.
 ///
-/// This class is used throughout the public API so dartdoc on pub.dev shows
-/// concrete fields and types instead of an unstructured map.
+/// The [SystemInfo] object is returned by [EdgeToEdgeSystemUIKotlin.getSystemInfo]
+/// and provides a structured snapshot of the platform state relevant to
+/// edge-to-edge UI handling. Fields are expressed in logical pixels (dp)
+/// where appropriate to match Flutter's conventions.
 class SystemInfo {
   /// Whether edge-to-edge mode is currently enabled on the device.
   final bool isEdgeToEdgeEnabled;

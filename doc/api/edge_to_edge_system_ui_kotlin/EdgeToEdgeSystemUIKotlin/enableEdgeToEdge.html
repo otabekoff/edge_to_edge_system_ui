@@ -54,7 +54,7 @@
 
     <section class="multi-line-signature">
       
-<span class="returntype"><a href="https://api.flutter.dev/flutter/dart-core/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+<span class="returntype"><a href="https://api.flutter.dev/flutter/dart-core/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span>&gt;</span></span>
 <span class="name ">enableEdgeToEdge</span>(<wbr>)
 
       
@@ -70,9 +70,18 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Future&lt;void&gt; enableEdgeToEdge() async {
-  await _channel.invokeMethod(&#39;enable&#39;);
-  isEdgeToEdgeEnabled = true;
+  <pre class="language-dart"><code class="language-dart">Future&lt;bool&gt; enableEdgeToEdge() async {
+  try {
+    final res = await _channel.invokeMethod&lt;bool&gt;(&#39;enable&#39;);
+    final success = res == true;
+    if (success) await initialize();
+    isEdgeToEdgeEnabled = isEdgeToEdgeEnabled || success;
+    return success;
+  } on PlatformException catch (e) {
+    &#47;&#47; ignore: avoid_print
+    print(&#39;enableEdgeToEdge failed: ${e.message}&#39;);
+    return false;
+  }
 }</code></pre>
 </section>
 
@@ -101,7 +110,7 @@
 <footer>
   <span class="no-break">
     edge_to_edge_system_ui
-      0.1.0-dev.2
+      0.1.0-dev.4
   </span>
   
 </footer>

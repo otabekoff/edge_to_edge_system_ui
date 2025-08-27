@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.0-dev.4 - 2025-08-27
+- Added "Deep Customize" controls to the example app allowing separate control of:
+	- status bar background color
+	- status bar content (icon/text) brightness
+	- navigation bar background color
+	- navigation bar content (icon/text) brightness
+- Fixed example compatibility issues with Color -> ARGB conversion across SDKs
+- Hid edge-to-edge toggle on Android 15+ where the OS enforces edge-to-edge behavior
+- Various example and documentation improvements
+
 ## 0.1.0-dev.3 - 2025-08-26
 - Added convenience methods `setLightSystemUI()` and `setDarkSystemUI()` with transparency options
 - Added `setSystemUIStyleWithBrightness()` method that accepts Flutter Color objects and Brightness enum

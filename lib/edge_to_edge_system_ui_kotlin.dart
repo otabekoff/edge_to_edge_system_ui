@@ -3,19 +3,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'system_info.dart';
 
-/// A small wrapper around the Kotlin plugin exposed via MethodChannel.
+/// A Dart wrapper around the native Kotlin plugin for controlling Edge-to-Edge
+/// system UI on Android.
 ///
-/// Example usage:
+/// This singleton exposes a small, typed API that communicates with the
+/// platform implementation using a [MethodChannel]. Use this class to:
+/// - Initialize the native plugin and read device capabilities.
+/// - Enable/disable edge-to-edge mode at runtime.
+/// - Query system insets and platform information via [getSystemInfo()].
+/// - Apply status/navigation bar colors and icon brightness.
+///
+/// Example
 /// ```dart
 /// await EdgeToEdgeSystemUIKotlin.instance.initialize();
 /// final info = await EdgeToEdgeSystemUIKotlin.instance.getSystemInfo();
 /// print('Nav height: ${info.navigationBarsHeight}');
 /// ```
-/// A singleton class that provides methods to control edge-to-edge system UI.
-///
-/// This class communicates with the native Android plugin via a MethodChannel.
-/// It provides methods to initialize the plugin, enable/disable edge-to-edge mode,
-/// retrieve system information, and customize the system UI style.
 class EdgeToEdgeSystemUIKotlin {
   static const MethodChannel _channel = MethodChannel('edge_to_edge_system_ui');
 
@@ -30,6 +33,15 @@ class EdgeToEdgeSystemUIKotlin {
   /// edge-to-edge mode is currently enabled.
   bool isEdgeToEdgeEnabled = false;
 
+  /// Whether the OS enforces edge-to-edge (Android 15+). This is separate
+  /// from `isEdgeToEdgeEnabled` which represents plugin actions.
+  bool isEdgeToEdgeEnforcedBySystem = false;
+
+  /// Cached Android API level (if available from plugin). Used to decide
+  /// whether to prefer transparent status bar (Flutter-drawn) or let the
+  /// native plugin paint via the overlay on Android 15+.
+  int? androidApiLevel;
+
   /// Initialize the plugin and cache a quick snapshot of supported/enabled.
   ///
   /// This method must be called before using other methods in this class.
@@ -39,6 +51,18 @@ class EdgeToEdgeSystemUIKotlin {
     if (map == null) return;
     isEdgeToEdgeSupported = map['isEdgeToEdgeSupported'] ?? false;
     isEdgeToEdgeEnabled = map['isEdgeToEdgeEnabled'] ?? false;
+    isEdgeToEdgeEnforcedBySystem = map['isEdgeToEdgeEnforcedBySystem'] ?? false;
+    // If the plugin returned an Android API level, cache it for rules below.
+    if (map.containsKey('androidVersion')) {
+      try {
+        final v = map['androidVersion'];
+        if (v is int) {
+          androidApiLevel = v;
+        } else if (v is String) {
+          androidApiLevel = int.tryParse(v);
+        }
+      } catch (_) {}
+    }
   }
 
   /// Returns a typed [SystemInfo] object describing system insets and
@@ -56,18 +80,36 @@ class EdgeToEdgeSystemUIKotlin {
   /// Enable edge-to-edge mode on the device (Android).
   ///
   /// This method makes the app content extend behind the system bars (status and navigation bars).
-  Future<void> enableEdgeToEdge() async {
-    await _channel.invokeMethod('enable');
-    isEdgeToEdgeEnabled = true;
+  Future<bool> enableEdgeToEdge() async {
+    try {
+      final res = await _channel.invokeMethod<bool>('enable');
+      final success = res == true;
+      if (success) await initialize();
+      isEdgeToEdgeEnabled = isEdgeToEdgeEnabled || success;
+      return success;
+    } on PlatformException catch (e) {
+      // ignore: avoid_print
+      print('enableEdgeToEdge failed: ${e.message}');
+      return false;
+    }
   }
 
   /// Disable edge-to-edge mode on the device (Android).
   ///
   /// This method restores the default system UI behavior, where the app content
   /// does not extend behind the system bars.
-  Future<void> disableEdgeToEdge() async {
-    await _channel.invokeMethod('disable');
-    isEdgeToEdgeEnabled = false;
+  Future<bool> disableEdgeToEdge() async {
+    try {
+      final res = await _channel.invokeMethod<bool>('disable');
+      final success = res == true;
+      if (success) await initialize();
+      if (success) isEdgeToEdgeEnabled = false;
+      return success;
+    } on PlatformException catch (e) {
+      // ignore: avoid_print
+      print('disableEdgeToEdge failed: ${e.message}');
+      return false;
+    }
   }
 
   /// Apply colors and appearance to the status and navigation bars.
@@ -94,7 +136,8 @@ class EdgeToEdgeSystemUIKotlin {
   ///
   /// [transparent] determines whether to use transparent colors or solid colors.
   Future<void> setLightSystemUI({bool transparent = false}) async {
-    final color = transparent ? Colors.transparent.toARGB32() : Colors.white.toARGB32();
+    final color =
+        transparent ? Colors.transparent.toARGB32() : Colors.white.toARGB32();
     await setSystemUIStyle(
       statusBarColor: color,
       navigationBarColor: color,
@@ -107,7 +150,8 @@ class EdgeToEdgeSystemUIKotlin {
   ///
   /// [transparent] determines whether to use transparent colors or solid colors.
   Future<void> setDarkSystemUI({bool transparent = false}) async {
-    final color = transparent ? Colors.transparent.toARGB32() : Colors.black.toARGB32();
+    final color =
+        transparent ? Colors.transparent.toARGB32() : Colors.black.toARGB32();
     await setSystemUIStyle(
       statusBarColor: color,
       navigationBarColor: color,
@@ -138,18 +182,22 @@ class EdgeToEdgeSystemUIKotlin {
   ///
   /// [brightness] should be the current theme brightness from Theme.of(context).brightness.
   Future<void> setSystemUIForTheme(Brightness brightness) async {
+    // Always send concrete colors to the plugin so the overlay can work properly.
+    // The plugin will handle overlay vs window.statusBarColor automatically.
     if (brightness == Brightness.dark) {
-      await setDarkSystemUI(transparent: isEdgeToEdgeEnabled);
+      await setDarkSystemUI(transparent: false);
     } else {
-      await setLightSystemUI(transparent: isEdgeToEdgeEnabled);
+      await setLightSystemUI(transparent: false);
     }
   }
 }
 
 /// A wrapper widget that automatically configures edge-to-edge mode and safe areas.
 ///
-/// This widget should wrap your app's content and will automatically handle
-/// edge-to-edge setup based on the device capabilities and your preferences.
+/// Place this widget near the top of your widget tree (for example as the
+/// `home` of your `MaterialApp`) to automatically initialize the native plugin
+/// and configure edge-to-edge behavior. `KotlinSystemUIWrapper` will optionally
+/// enable edge-to-edge and apply theme-based system UI colors.
 class KotlinSystemUIWrapper extends StatefulWidget {
   /// The child widget to wrap.
   final Widget child;
@@ -195,6 +243,9 @@ class _KotlinSystemUIWrapperState extends State<KotlinSystemUIWrapper>
   Future<void> _configureSystemUI() async {
     final plugin = EdgeToEdgeSystemUIKotlin.instance;
 
+    // Ensure we have an up-to-date snapshot from the platform before using flags
+    await plugin.initialize();
+
     if (widget.enableEdgeToEdge && plugin.isEdgeToEdgeSupported) {
       await plugin.enableEdgeToEdge();
     }
@@ -205,6 +256,12 @@ class _KotlinSystemUIWrapperState extends State<KotlinSystemUIWrapper>
     }
   }
 
+  /// Public helper to refresh plugin state and reapply theme. Call this from
+  /// the UI after toggling enable/disable so the wrapper reflects the new state.
+  Future<void> refresh() async {
+    await _configureSystemUI();
+  }
+
   @override
   Widget build(BuildContext context) {
     return widget.child;
@@ -213,8 +270,10 @@ class _KotlinSystemUIWrapperState extends State<KotlinSystemUIWrapper>
 
 /// A safe area widget that accounts for system UI insets in edge-to-edge mode.
 ///
-/// This widget provides padding to ensure content is not obscured by
-/// system bars when in edge-to-edge mode.
+/// Use `KotlinEdgeToEdgeSafeArea` instead of `SafeArea` when your app may run
+/// in edge-to-edge mode. This widget will automatically switch between using
+/// `SafeArea` (when not in edge-to-edge or when `forceSafeArea` is true) and
+/// applying `MediaQuery` padding when the plugin reports edge-to-edge is active.
 class KotlinEdgeToEdgeSafeArea extends StatelessWidget {
   /// The child widget to provide safe area padding for.
   final Widget child;
@@ -234,6 +293,14 @@ class KotlinEdgeToEdgeSafeArea extends StatelessWidget {
   /// Minimum padding to apply even when not in edge-to-edge mode.
   final EdgeInsets minimum;
 
+  /// Force using Flutter's `SafeArea` even when edge-to-edge is active.
+  ///
+  /// Some apps prefer the platform-safe-area semantics provided by the
+  /// `SafeArea` widget instead of manually applying MediaQuery padding.
+  /// Set this to `true` to always wrap the child with `SafeArea` when
+  /// content should avoid system bars.
+  final bool forceSafeArea;
+
   const KotlinEdgeToEdgeSafeArea({
     super.key,
     required this.child,
@@ -242,6 +309,7 @@ class KotlinEdgeToEdgeSafeArea extends StatelessWidget {
     this.left = true,
     this.right = true,
     this.minimum = EdgeInsets.zero,
+    this.forceSafeArea = false,
   });
 
   @override
@@ -249,8 +317,13 @@ class KotlinEdgeToEdgeSafeArea extends StatelessWidget {
     final mediaQuery = MediaQuery.of(context);
     final plugin = EdgeToEdgeSystemUIKotlin.instance;
 
-    // If not in edge-to-edge mode, use standard SafeArea
-    if (!plugin.isEdgeToEdgeEnabled) {
+    // Treat either plugin-enabled or OS-enforced edge-to-edge as edge-to-edge mode
+    final inEdgeToEdgeMode =
+        plugin.isEdgeToEdgeEnabled || plugin.isEdgeToEdgeEnforcedBySystem;
+
+    // If we're not in edge-to-edge mode, or the caller requested a SafeArea
+    // explicitly, use Flutter's SafeArea wrapper.
+    if (!inEdgeToEdgeMode || forceSafeArea) {
       return SafeArea(
         top: top,
         bottom: bottom,
@@ -265,9 +338,12 @@ class KotlinEdgeToEdgeSafeArea extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.only(
         top: top ? (mediaQuery.padding.top + minimum.top) : minimum.top,
-        bottom: bottom ? (mediaQuery.padding.bottom + minimum.bottom) : minimum.bottom,
+        bottom: bottom
+            ? (mediaQuery.padding.bottom + minimum.bottom)
+            : minimum.bottom,
         left: left ? (mediaQuery.padding.left + minimum.left) : minimum.left,
-        right: right ? (mediaQuery.padding.right + minimum.right) : minimum.right,
+        right:
+            right ? (mediaQuery.padding.right + minimum.right) : minimum.right,
       ),
       child: child,
     );
@@ -275,35 +351,46 @@ class KotlinEdgeToEdgeSafeArea extends StatelessWidget {
 }
 
 /// Utility function to get Android version name from API level.
+///
+/// Returns a human-friendly Android name for well-known API levels and falls
+/// back to a generic string for unknown or future versions.
 String whenSdk(int apiLevel) {
   switch (apiLevel) {
+    case 36:
+      return '16 Baklava';
+    case 35:
+      return '15 Vanilla Ice Cream';
     case 34:
-      return 'Android 14 (API 34)';
+      return '14 Upside Down Cake';
     case 33:
-      return 'Android 13 (API 33)';
+      return '13 Tiramisu';
     case 32:
-      return 'Android 12L (API 32)';
+      return '12L Snow Cone V2';
     case 31:
-      return 'Android 12 (API 31)';
+      return '12 Snow Cone';
     case 30:
-      return 'Android 11 (API 30)';
+      return '11 Red Velvet Cake';
     case 29:
-      return 'Android 10 (API 29)';
+      return '10 Quince Tart';
     case 28:
-      return 'Android 9 (API 28)';
+      return '9 Pie';
     case 27:
-      return 'Android 8.1 (API 27)';
+      return '8.1 Oreo MR1';
     case 26:
-      return 'Android 8.0 (API 26)';
+      return '8.0 Oreo';
     case 25:
-      return 'Android 7.1 (API 25)';
+      return '7.1 Nougat MR1';
     case 24:
-      return 'Android 7.0 (API 24)';
+      return '7.0 Nougat';
     case 23:
-      return 'Android 6.0 (API 23)';
+      return '6.0 Marshmallow';
+    case 22:
+      return '5.1 Lollipop MR1';
+    case 21:
+      return '5.0 Lollipop';
     default:
-      if (apiLevel >= 35) {
-        return 'Android ${((apiLevel - 21) / 1) + 5} (API $apiLevel)';
+      if (apiLevel > 36) {
+        return 'Android (Unknown future version, API $apiLevel)';
       }
       return 'Android API $apiLevel';
   }

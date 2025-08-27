@@ -1,8 +1,6 @@
 // File: example/lib/main.dart - Fixed for v0.1.0-dev.3
 
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:edge_to_edge_system_ui/edge_to_edge_system_ui.dart';
 
 // App-wide theme mode notifier (Auto/System, Light, Dark)
@@ -77,8 +75,8 @@ class SystemInfoCardWidgetState extends State<SystemInfoCardWidget> {
                   Text(
                     'System Information',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                          fontWeight: FontWeight.bold,
+                        ),
                   ),
                   const SizedBox(height: 12),
                   if (_info != null) ...[
@@ -182,6 +180,12 @@ class _KotlinHomePageState extends State<KotlinHomePage> {
   final GlobalKey<SystemInfoCardWidgetState> _systemInfoKey =
       GlobalKey<SystemInfoCardWidgetState>();
 
+  // Deep customize state
+  Color _deepStatusBarBg = Colors.blue;
+  Color _deepNavBarBg = Colors.black;
+  Brightness _deepStatusIconBrightness = Brightness.light;
+  Brightness _deepNavIconBrightness = Brightness.light;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -210,6 +214,9 @@ class _KotlinHomePageState extends State<KotlinHomePage> {
               const SizedBox(height: 20),
 
               _buildCustomColorCard(),
+              const SizedBox(height: 20),
+
+              _buildDeepCustomizeCard(),
               const SizedBox(height: 100), // Extra space at bottom
             ],
           ),
@@ -230,9 +237,9 @@ class _KotlinHomePageState extends State<KotlinHomePage> {
           children: [
             Text(
               'Controls',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
 
@@ -307,27 +314,32 @@ class _KotlinHomePageState extends State<KotlinHomePage> {
 
             const SizedBox(height: 12),
 
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: plugin.isEdgeToEdgeSupported
-                        ? () => _toggleEdgeToEdge()
-                        : null,
-                    icon: Icon(
-                      plugin.isEdgeToEdgeEnabled
-                          ? Icons.fullscreen_exit
-                          : Icons.fullscreen,
-                    ),
-                    label: Text(
-                      plugin.isEdgeToEdgeEnabled
-                          ? 'Disable Edge-to-Edge'
-                          : 'Enable Edge-to-Edge',
-                    ),
+            // Hide the enable/disable control on Android 15+ where the OS
+            // enforces edge-to-edge behavior.
+            (plugin.androidApiLevel != null && plugin.androidApiLevel! >= 15)
+                ? const SizedBox.shrink()
+                : Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: (plugin.isEdgeToEdgeSupported &&
+                                  !plugin.isEdgeToEdgeEnforcedBySystem)
+                              ? () => _toggleEdgeToEdge()
+                              : null,
+                          icon: Icon(
+                            plugin.isEdgeToEdgeEnabled
+                                ? Icons.fullscreen_exit
+                                : Icons.fullscreen,
+                          ),
+                          label: Text(
+                            plugin.isEdgeToEdgeEnabled
+                                ? 'Disable Edge-to-Edge'
+                                : 'Enable Edge-to-Edge',
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
-            ),
 
             const SizedBox(height: 8),
 
@@ -378,43 +390,20 @@ class _KotlinHomePageState extends State<KotlinHomePage> {
           children: [
             Text(
               'Preset Styles',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
-
             Wrap(
               spacing: 8,
               runSpacing: 8,
               children: [
                 ElevatedButton(
                   onPressed: () => EdgeToEdgeSystemUIKotlin.instance
-                      .setLightSystemUI(transparent: true),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white70,
-                  ),
-                  child: const Text(
-                    'Light Transparent',
-                    style: TextStyle(color: Colors.black),
-                  ),
-                ),
-                ElevatedButton(
-                  onPressed: () => EdgeToEdgeSystemUIKotlin.instance
-                      .setDarkSystemUI(transparent: true),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black87,
-                  ),
-                  child: const Text(
-                    'Dark Transparent',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-                ElevatedButton(
-                  onPressed: () => EdgeToEdgeSystemUIKotlin.instance
                       .setLightSystemUI(transparent: false),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
+                    backgroundColor: Colors.white70,
                   ),
                   child: const Text(
                     'Light Solid',
@@ -425,10 +414,42 @@ class _KotlinHomePageState extends State<KotlinHomePage> {
                   onPressed: () => EdgeToEdgeSystemUIKotlin.instance
                       .setDarkSystemUI(transparent: false),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
+                    backgroundColor: Colors.black87,
                   ),
                   child: const Text(
                     'Dark Solid',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: () =>
+                      EdgeToEdgeSystemUIKotlin.instance.setSystemUIStyle(
+                    statusBarColor: _colorToInt(Colors.white),
+                    navigationBarColor: _colorToInt(Colors.white),
+                    statusBarLight: false,
+                    navigationBarLight: false,
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                  ),
+                  child: const Text(
+                    'White',
+                    style: TextStyle(color: Colors.black),
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: () =>
+                      EdgeToEdgeSystemUIKotlin.instance.setSystemUIStyle(
+                    statusBarColor: _colorToInt(Colors.black),
+                    navigationBarColor: _colorToInt(Colors.black),
+                    statusBarLight: true,
+                    navigationBarLight: true,
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.black,
+                  ),
+                  child: const Text(
+                    'Black',
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
@@ -450,12 +471,11 @@ class _KotlinHomePageState extends State<KotlinHomePage> {
           children: [
             Text(
               'Custom Colors',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
-
             Wrap(
               spacing: 8,
               runSpacing: 8,
@@ -468,9 +488,7 @@ class _KotlinHomePageState extends State<KotlinHomePage> {
                 _buildColorButton('Teal', Colors.teal),
               ],
             ),
-
             const SizedBox(height: 12),
-
             Row(
               children: [
                 Expanded(
@@ -485,6 +503,149 @@ class _KotlinHomePageState extends State<KotlinHomePage> {
         ),
       ),
     );
+  }
+
+  Widget _buildDeepCustomizeCard() {
+    return Card(
+      elevation: 8,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Deep Customize',
+              style: Theme.of(context)
+                  .textTheme
+                  .titleLarge
+                  ?.copyWith(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 12),
+
+            // Status bar background picker (simple swatches)
+            const Text('Status bar background'),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              children: [
+                _swatchButton(
+                    Colors.blue, () => _applyDeepColors(statusBg: Colors.blue)),
+                _swatchButton(Colors.white,
+                    () => _applyDeepColors(statusBg: Colors.white)),
+                _swatchButton(Colors.black,
+                    () => _applyDeepColors(statusBg: Colors.black)),
+                _swatchButton(Colors.green,
+                    () => _applyDeepColors(statusBg: Colors.green)),
+              ],
+            ),
+            const SizedBox(height: 12),
+
+            // Status bar content color (Light/Dark)
+            Row(
+              children: [
+                const Text('Status bar content:'),
+                const SizedBox(width: 12),
+                ToggleButtons(
+                  isSelected: [
+                    _deepStatusIconBrightness == Brightness.light,
+                    _deepStatusIconBrightness == Brightness.dark,
+                  ],
+                  onPressed: (i) {
+                    setState(() {
+                      _deepStatusIconBrightness =
+                          i == 0 ? Brightness.light : Brightness.dark;
+                    });
+                    _applyDeepColors(statusIcon: _deepStatusIconBrightness);
+                  },
+                  children: const [Text('Light'), Text('Dark')],
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+
+            // Nav bar background picker
+            const Text('Navigation bar background'),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              children: [
+                _swatchButton(
+                    Colors.black, () => _applyDeepColors(navBg: Colors.black)),
+                _swatchButton(
+                    Colors.white, () => _applyDeepColors(navBg: Colors.white)),
+                _swatchButton(
+                    Colors.blue, () => _applyDeepColors(navBg: Colors.blue)),
+                _swatchButton(
+                    Colors.grey, () => _applyDeepColors(navBg: Colors.grey)),
+              ],
+            ),
+            const SizedBox(height: 12),
+
+            // Nav bar content color (Light/Dark)
+            Row(
+              children: [
+                const Text('Navigation bar content:'),
+                const SizedBox(width: 12),
+                ToggleButtons(
+                  isSelected: [
+                    _deepNavIconBrightness == Brightness.light,
+                    _deepNavIconBrightness == Brightness.dark,
+                  ],
+                  onPressed: (i) {
+                    setState(() {
+                      _deepNavIconBrightness =
+                          i == 0 ? Brightness.light : Brightness.dark;
+                    });
+                    _applyDeepColors(navIcon: _deepNavIconBrightness);
+                  },
+                  children: const [Text('Light'), Text('Dark')],
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _swatchButton(Color color, VoidCallback onTap) {
+    return ElevatedButton(
+      onPressed: onTap,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: color,
+        minimumSize: const Size(48, 36),
+      ),
+      child: const SizedBox.shrink(),
+    );
+  }
+
+  void _applyDeepColors({
+    Color? statusBg,
+    Color? navBg,
+    Brightness? statusIcon,
+    Brightness? navIcon,
+  }) {
+    if (statusBg != null) _deepStatusBarBg = statusBg;
+    if (navBg != null) _deepNavBarBg = navBg;
+    if (statusIcon != null) _deepStatusIconBrightness = statusIcon;
+    if (navIcon != null) _deepNavIconBrightness = navIcon;
+
+    // Call plugin with explicit values and brightness
+    EdgeToEdgeSystemUIKotlin.instance.setSystemUIStyleWithBrightness(
+      statusBarColor: _deepStatusBarBg,
+      navigationBarColor: _deepNavBarBg,
+      statusBarIconBrightness: _deepStatusIconBrightness,
+      navigationBarIconBrightness: _deepNavIconBrightness,
+    );
+
+    setState(() {});
+  }
+
+  // Compatibility helper: convert a Color to ARGB int for plugin calls
+  // Avoid using the deprecated `.value` getter; compose ARGB explicitly.
+  int _colorToInt(Color c) {
+    // Use the modern API when available.
+    return c.toARGB32();
   }
 
   Widget _buildColorButton(String name, Color color) {
@@ -503,10 +664,55 @@ class _KotlinHomePageState extends State<KotlinHomePage> {
     return luminance > 0.5 ? Colors.black : Colors.white;
   }
 
+  Future<void> _refreshSystemInfo() async {
+    _systemInfoKey.currentState?.refresh();
+  }
+
+  void _resetToTheme() {
+    final brightness = MediaQuery.of(context).platformBrightness;
+    EdgeToEdgeSystemUIKotlin.instance.setSystemUIForTheme(brightness);
+  }
+
+  void _setCustomColor(Color color) {
+    EdgeToEdgeSystemUIKotlin.instance.setSystemUIStyleWithBrightness(
+      statusBarColor: color,
+      navigationBarColor: color,
+      statusBarIconBrightness: Brightness.light,
+      navigationBarIconBrightness: Brightness.light,
+    );
+  }
+
   Future<void> _toggleEdgeToEdge() async {
     final plugin = EdgeToEdgeSystemUIKotlin.instance;
 
+    bool success = false;
     if (plugin.isEdgeToEdgeEnabled) {
-      await plugin.disableEdgeToEdge();
+      success = await plugin.disableEdgeToEdge();
     } else {
-      await plugin.enableEdge
+      success = await plugin.enableEdgeToEdge();
+    }
+
+    // Refresh info card and rebuild controls so button reflects new state
+    await _refreshSystemInfo();
+    if (mounted) setState(() {});
+
+    if (!success && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to toggle edge-to-edge')),
+      );
+    }
+  }
+}
+
+// Ensure DebugInfoPage is defined or imported
+class DebugInfoPage extends StatelessWidget {
+  const DebugInfoPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Debug Info')),
+      body: const Center(child: Text('Debug information goes here.')),
+    );
+  }
+}

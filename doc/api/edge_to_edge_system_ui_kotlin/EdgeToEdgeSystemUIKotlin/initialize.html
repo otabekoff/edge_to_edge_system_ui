@@ -76,6 +76,18 @@ It retrieves the current edge-to-edge support and enabled state from the native 
   if (map == null) return;
   isEdgeToEdgeSupported = map[&#39;isEdgeToEdgeSupported&#39;] ?? false;
   isEdgeToEdgeEnabled = map[&#39;isEdgeToEdgeEnabled&#39;] ?? false;
+  isEdgeToEdgeEnforcedBySystem = map[&#39;isEdgeToEdgeEnforcedBySystem&#39;] ?? false;
+  &#47;&#47; If the plugin returned an Android API level, cache it for rules below.
+  if (map.containsKey(&#39;androidVersion&#39;)) {
+    try {
+      final v = map[&#39;androidVersion&#39;];
+      if (v is int) {
+        androidApiLevel = v;
+      } else if (v is String) {
+        androidApiLevel = int.tryParse(v);
+      }
+    } catch (_) {}
+  }
 }</code></pre>
 </section>
 
@@ -104,7 +116,7 @@ It retrieves the current edge-to-edge support and enabled state from the native 
 <footer>
   <span class="no-break">
     edge_to_edge_system_ui
-      0.1.0-dev.2
+      0.1.0-dev.4
   </span>
   
 </footer>
