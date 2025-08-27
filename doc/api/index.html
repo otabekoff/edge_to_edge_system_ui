@@ -46,9 +46,17 @@
   <h1 id="edge_to_edge_system_ui">edge_to_edge_system_ui</h1>
 <div class="markdown-alert markdown-alert-note">
 <p class="markdown-alert-title">Note</p>
-<p>Useful information that users should know, even when skimming content.</p>
+<p>This package is currently in active development and not intended for general public use. Dev releases are provided for contributors and testers only. Once the package is stable, it will be published with standard versioning and this notice will be removed.</p>
 </div>
 <p>A small Flutter plugin that exposes an Android Kotlin implementation to control edge-to-edge system UI (status/navigation bars) and surface insets. Designed as a lightweight plugin suitable for inclusion on pub.dev.</p>
+<p>This package offers a unified approach to managing the status bar and system navigation bar across all major Android versions (5 through 15+). It automatically applies the appropriate edge-to-edge techniques for each platform version, ensuring consistent system UI behavior and appearance, including support for new features introduced in Android 15 and above.</p>
+<p>The plugin adapts its handling of the status bar and navigation bar based on the Android version:</p>
+<ul>
+<li><strong>Android 5–9:</strong> Uses legacy system UI flags and manual inset management for immersive effects.</li>
+<li><strong>Android 10–14:</strong> Applies modern APIs for improved navigation bar styling and consistent appearance.</li>
+<li><strong>Android 15+:</strong> Edge-to-edge mode is enabled by default, leveraging the latest system UI features and platform behaviors.</li>
+</ul>
+<p>This ensures optimal system UI integration and appearance across all supported Android versions.</p>
 <p>Features</p>
 <ul>
 <li>Query system inset sizes and whether edge-to-edge mode is enabled</li>
