@@ -27,14 +27,13 @@ Usage
 
 Example code is included in the `example/` folder.
 
-Quick start
------------
+## Quick start
 
 Add the package to `pubspec.yaml` (when published):
 
 ```yaml
 dependencies:
-	edge_to_edge_system_ui: ^0.1.0-dev.4
+  edge_to_edge_system_ui: ^0.1.0-dev.6
 ```
 
 Initialize and query system info:
@@ -66,6 +65,24 @@ This is required because route lifecycle callbacks are delivered only to
 observers registered on the same `Navigator` that owns the route. Registering
 the observer ensures the package's `RouteAware` listeners receive push/pop
 notifications and can automatically reapply or restore styles.
+
+## Auto-enable policy (important)
+
+As of the current development release, the package intentionally does not
+automatically enable edge-to-edge mode on Android 14 and earlier during
+initialization. This avoids unexpectedly changing the device's window state
+across hot restarts or when an app does not explicitly request edge-to-edge.
+
+On Android 15 and later the OS enforces edge-to-edge by default and the
+package will respect that behavior. If you want your app to enable
+edge-to-edge on older Android versions programmatically, call:
+
+```dart
+await EdgeToEdgeSystemUIKotlin.instance.enableEdgeToEdge();
+```
+
+This policy reduces surprising system-wide side-effects and makes enabling
+edge-to-edge an explicit app choice on older platforms.
 
 Publishing
 - Update `publish_to` in `pubspec.yaml` to point to `https://pub.dev`.
@@ -149,6 +166,7 @@ await EdgeToEdgeSystemUIKotlin.instance.invokeLegacy(
     'navigationBarIconBrightness': 'dark',
   }
 );
+```
 
 ## 0.1.0-dev.4 (2025-08-27)
 
@@ -157,4 +175,3 @@ This is a development release containing example improvements and bugfixes:
 - Added a "Deep Customize" section in the example app allowing separate control of status bar and navigation bar backgrounds and content brightness.
 - Fixed Color -> ARGB compatibility in the example across Flutter SDKs.
 - Improved example flow and documentation prior to a dev publish.
-```

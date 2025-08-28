@@ -538,8 +538,29 @@ class _KotlinSystemUIWrapperState extends State<KotlinSystemUIWrapper>
     // Ensure we have an up-to-date snapshot from the platform before using flags
     await plugin.initialize();
 
-    if (widget.enableEdgeToEdge && plugin.isEdgeToEdgeSupported) {
-      await plugin.enableEdgeToEdge();
+    // Do not automatically enable edge-to-edge on older Android releases.
+    // Rule: Android 15+ (OS-enforced) -> edge-to-edge is enforced by the system.
+    // On Android 14 and below we should NOT flip the device to edge-to-edge
+    // automatically during wrapper initialization because that changes
+    // system state unexpectedly during app startup or a hot restart. Apps
+    // that want to enable edge-to-edge on older Android versions can call
+    // `EdgeToEdgeSystemUIKotlin.instance.enableEdgeToEdge()` explicitly.
+    if (plugin.isEdgeToEdgeSupported) {
+      // If the OS enforces edge-to-edge, the native implementation will
+      // already report that via `isEdgeToEdgeEnforcedBySystem` and the
+      // plugin snapshot from `initialize()` reflects the true state. We
+      // should not call `enableEdgeToEdge()` automatically on older OS
+      // versions because that would persist state across hot restarts and
+      // produce the behavior you observed.
+      if (plugin.isEdgeToEdgeEnforcedBySystem) {
+        // Nothing to do; the OS enforces edge-to-edge and native state
+        // already reflects that.
+      } else {
+        // For older OS (API < Android 15), honor the native snapshot and
+        // do not change the device state automatically. The example app
+        // should provide a manual toggle (UI) for users to opt into
+        // enabling edge-to-edge.
+      }
     }
 
     if (widget.enforceContrast && mounted) {

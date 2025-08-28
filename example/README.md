@@ -9,8 +9,7 @@ This example demonstrates how to use the `edge_to_edge_system_ui` package to:
 - Use `pushStyleForRoute` to apply a style that will be automatically
   restored when the route is popped.
 
-Quick start
------------
+## Quick start
 
 1. In the example `main.dart` the plugin is initialized in `main()`.
 2. The example `MaterialApp` registers the package `routeObserver` so per-route
@@ -22,8 +21,7 @@ navigatorObservers: [routeObserver],
 
 3. Run the example via `flutter run` in the `example/` directory.
 
-Files of interest
------------------
+## Files of interest
 - `lib/main.dart` — app entry; shows initialization and the registered
   `routeObserver`.
 - `lib/home_page.dart` — main UI showing presets, custom colors, and deep
@@ -32,8 +30,7 @@ Files of interest
   that push styles for specific routes and demonstrate automatic
   restoration when navigating back.
 
-Notes
------
+## Notes
 - The example imports the package using `package:edge_to_edge_system_ui/...`
   so it mirrors how external users would use the package.
 - If you intend to publish the package, ensure `doc/getting_started.md` is

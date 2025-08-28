@@ -140,9 +140,69 @@ class _KotlinHomePageState extends State<KotlinHomePage> {
   Color _deepNavBarBg = Colors.black;
 
   @override
+  void initState() {
+    super.initState();
+    // Listen to theme changes and apply system UI colors accordingly
+    appThemeModeNotifier.addListener(_onThemeModeChanged);
+    // Apply initial theme-based system UI
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _updateSystemUIForCurrentTheme();
+    });
+  }
+
+  @override
+  void dispose() {
+    appThemeModeNotifier.removeListener(_onThemeModeChanged);
+    super.dispose();
+  }
+
+  void _onThemeModeChanged() {
+    _updateSystemUIForCurrentTheme();
+  }
+
+  void _updateSystemUIForCurrentTheme() {
+    final themeMode = appThemeModeNotifier.value;
+    final platformBrightness = MediaQuery.of(context).platformBrightness;
+
+    Brightness effectiveBrightness;
+    switch (themeMode) {
+      case ThemeMode.light:
+        effectiveBrightness = Brightness.light;
+        break;
+      case ThemeMode.dark:
+        effectiveBrightness = Brightness.dark;
+        break;
+      case ThemeMode.system:
+        effectiveBrightness = platformBrightness;
+        break;
+    }
+
+    // Apply theme-based system UI colors
+    if (effectiveBrightness == Brightness.dark) {
+      // Dark theme - use dark backgrounds
+      EdgeToEdgeSystemUIKotlin.instance.setSystemUIStyleForColors(
+        statusBarColor: Colors.black,
+        navigationBarColor: Colors.black,
+      );
+    } else {
+      // Light theme - use light backgrounds
+      EdgeToEdgeSystemUIKotlin.instance.setSystemUIStyleForColors(
+        statusBarColor: Colors.white,
+        navigationBarColor: Colors.white,
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Kotlin Home')),
+      appBar: AppBar(
+        title: const Text('Kotlin Home'),
+        foregroundColor: Colors.white,
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? Colors.purple
+            : Colors.blue,
+      ),
       body: SingleChildScrollView(
         // Add bottom padding to avoid being covered by system UI (navigation bar)
         padding: EdgeInsets.fromLTRB(
@@ -169,6 +229,17 @@ class _KotlinHomePageState extends State<KotlinHomePage> {
     );
   }
 
+  // Add a method to reset to current theme (useful for after custom colors)
+  void _resetToCurrentTheme() {
+    _updateSystemUIForCurrentTheme();
+  }
+
+  // Update the existing _resetToTheme method to use the new logic
+  void _resetToTheme() {
+    _resetToCurrentTheme();
+  }
+
+  // Rest of your existing methods remain the same...
   Widget _buildControlsCard() {
     final plugin = EdgeToEdgeSystemUIKotlin.instance;
     final info = _systemInfoKey.currentState?.systemInfo;
@@ -193,89 +264,48 @@ class _KotlinHomePageState extends State<KotlinHomePage> {
               ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
-
-            Row(
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Theme:'),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ValueListenableBuilder<ThemeMode>(
-                    valueListenable: appThemeModeNotifier,
-                    builder: (context, mode, _) {
-                      return RadioGroup<ThemeMode>(
-                        groupValue: mode,
-                        onChanged: (v) =>
-                            appThemeModeNotifier.value = v ?? ThemeMode.system,
-                        child: const Wrap(
-                          spacing: 12,
-                          crossAxisAlignment: WrapCrossAlignment.center,
-                          children: [
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Radio<ThemeMode>(value: ThemeMode.system),
-                                Text('Auto'),
-                              ],
-                            ),
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Radio<ThemeMode>(value: ThemeMode.light),
-                                Text('Light'),
-                              ],
-                            ),
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Radio<ThemeMode>(value: ThemeMode.dark),
-                                Text('Dark'),
-                              ],
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
+                const Row(
+                  children: [Text('Theme:'), SizedBox(width: 12)],
+                ),
+                ValueListenableBuilder<ThemeMode>(
+                  valueListenable: appThemeModeNotifier,
+                  builder: (context, mode, _) {
+                    return RadioGroup<ThemeMode>(
+                      groupValue: mode,
+                      onChanged: (v) =>
+                          appThemeModeNotifier.value = v ?? ThemeMode.system,
+                      child: const Column(
+                        children: [
+                          RadioListTile<ThemeMode>(
+                            title: Text('Auto'),
+                            value: ThemeMode.system,
+                          ),
+                          RadioListTile<ThemeMode>(
+                            title: Text('Light'),
+                            value: ThemeMode.light,
+                          ),
+                          RadioListTile<ThemeMode>(
+                            title: Text('Dark'),
+                            value: ThemeMode.dark,
+                          ),
+                        ],
+                      ),
+                    );
+                  },
                 ),
               ],
             ),
-
             const SizedBox(height: 12),
-
             Text(
               'Debug: supported=${plugin.isEdgeToEdgeSupported}, android=${info?.androidVersion ?? 'unknown'}, enforced=${plugin.isEdgeToEdgeEnforcedBySystem}',
               style: Theme.of(context).textTheme.bodySmall,
             ),
             const SizedBox(height: 8),
-
-            (info?.androidVersion != null && info!.androidVersion! >= 15)
-                ? const SizedBox.shrink()
-                : Row(
-                    children: [
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed:
-                              (plugin.isEdgeToEdgeSupported &&
-                                  !plugin.isEdgeToEdgeEnforcedBySystem)
-                              ? _toggleEdgeToEdge
-                              : null,
-                          icon: Icon(
-                            plugin.isEdgeToEdgeEnabled
-                                ? Icons.fullscreen_exit
-                                : Icons.fullscreen,
-                          ),
-                          label: Text(
-                            plugin.isEdgeToEdgeEnabled
-                                ? 'Disable Edge-to-Edge'
-                                : 'Enable Edge-to-Edge',
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-
+            const SizedBox.shrink(),
             const SizedBox(height: 8),
-
             Row(
               children: [
                 Expanded(
@@ -287,9 +317,7 @@ class _KotlinHomePageState extends State<KotlinHomePage> {
                 ),
               ],
             ),
-
             const SizedBox(height: 8),
-
             Row(
               children: [
                 Expanded(
@@ -331,6 +359,7 @@ class _KotlinHomePageState extends State<KotlinHomePage> {
     );
   }
 
+  // Rest of your existing methods...
   Widget _buildPresetColorsCard() {
     return Card(
       elevation: 8,
@@ -563,11 +592,6 @@ class _KotlinHomePageState extends State<KotlinHomePage> {
     _systemInfoKey.currentState?.refresh();
   }
 
-  void _resetToTheme() {
-    final brightness = MediaQuery.of(context).platformBrightness;
-    EdgeToEdgeSystemUIKotlin.instance.setSystemUIForTheme(brightness);
-  }
-
   void _setCustomColor(Color color) {
     EdgeToEdgeSystemUIKotlin.instance.setSystemUIStyleForColors(
       statusBarColor: color,
@@ -575,23 +599,7 @@ class _KotlinHomePageState extends State<KotlinHomePage> {
     );
   }
 
-  Future<void> _toggleEdgeToEdge() async {
-    final plugin = EdgeToEdgeSystemUIKotlin.instance;
-
-    bool success = false;
-    if (plugin.isEdgeToEdgeEnabled) {
-      success = await plugin.disableEdgeToEdge();
-    } else {
-      success = await plugin.enableEdgeToEdge();
-    }
-
-    await _refreshSystemInfo();
-    if (mounted) setState(() {});
-
-    if (!success && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to toggle edge-to-edge')),
-      );
-    }
-  }
+  // Toggle removed: manual enable/disable UI has been removed. Use
+  // EdgeToEdgeSystemUIKotlin.instance.enableEdgeToEdge()/disableEdgeToEdge()
+  // directly if needed.
 }

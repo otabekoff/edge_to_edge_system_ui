@@ -5,8 +5,8 @@
 /// system insets, enable/disable edge-to-edge behavior, and set system bar
 /// colors. See the `example/` folder for a runnable example.
 ///
-/// Version 0.1.0-dev.3 includes:
-/// - Enhanced API with convenience methods for common use cases
+/// Version 0.1.0-dev.6 includes:
+/// - Centralized brightness computation and stabilized public API
 /// - Flutter-friendly parameter types (Color objects, Brightness enum)
 /// - Wrapper widgets for automatic configuration and safe areas
 /// - Utility functions for Android version mapping

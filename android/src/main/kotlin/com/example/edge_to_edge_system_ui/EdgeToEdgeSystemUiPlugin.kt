@@ -329,26 +329,37 @@ class EdgeToEdgeSystemUiPlugin: FlutterPlugin, MethodCallHandler, ActivityAware 
         }
 
         // Set icon/content brightness using WindowInsetsControllerCompat
+        // FIXED: Correct the logic and API level checks
         try {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
             
+            // Status bar icons (Android 6.0+)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                // statusLight = true means we want light/white icons (for dark backgrounds)
+                // isAppearanceLightStatusBars = true means dark icons (for light backgrounds)
                 controller.isAppearanceLightStatusBars = !statusLight
-                Log.d(TAG, "Set status bar icons light: ${!statusLight}")
+                Log.d(TAG, "Set status bar icons to ${if (!statusLight) "dark" else "light"}")
             }
             
+            // Navigation bar icons (Android 8.0+ API 26, not 27!)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                controller.isAppearanceLightNavigationBars = !navLight  
-                Log.d(TAG, "Set navigation bar icons light: ${!navLight}")
+                // navLight = true means we want light/white icons (for dark backgrounds)
+                // isAppearanceLightNavigationBars = true means dark icons (for light backgrounds)
+                controller.isAppearanceLightNavigationBars = !navLight
+                Log.d(TAG, "Set navigation bar icons to ${if (!navLight) "dark" else "light"}")
+            } else {
+                Log.d(TAG, "Navigation bar icon brightness not supported on API ${Build.VERSION.SDK_INT}")
             }
         } catch (e: Exception) {
             Log.w(TAG, "Failed to set system UI appearance: ${e.message}")
         }
 
-        // Re-apply after a short delay to override potential embedding/Flutter overrides.
+        // Re-apply after a short delay to override potential embedding/Flutter overrides
+        // Also re-apply the icon brightness settings
         try {
             window.decorView.postDelayed({
                 try {
+                    // Re-apply colors
                     if (statusColor != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                         window.statusBarColor = statusColor
                         Log.d(TAG, "Reapplied status bar color: $statusColor")
@@ -356,6 +367,17 @@ class EdgeToEdgeSystemUiPlugin: FlutterPlugin, MethodCallHandler, ActivityAware 
                     if (navColor != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                         window.navigationBarColor = navColor
                         Log.d(TAG, "Reapplied navigation bar color: $navColor")
+                    }
+                    
+                    // Re-apply icon brightness
+                    val controller = WindowInsetsControllerCompat(window, window.decorView)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        controller.isAppearanceLightStatusBars = !statusLight
+                        Log.d(TAG, "Reapplied status bar icon brightness")
+                    }
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        controller.isAppearanceLightNavigationBars = !navLight
+                        Log.d(TAG, "Reapplied navigation bar icon brightness")
                     }
                 } catch (e: Exception) {
                     Log.w(TAG, "Reapply failed: ${e.message}")

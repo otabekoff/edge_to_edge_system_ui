@@ -1,11 +1,20 @@
 # Changelog
 
+## 0.1.0-dev.6 - 2025-08-28
+- Development release: patch/dev increment with example/docs and init behavior tweaks.
+- Centralized system UI brightness computation in the Dart wrapper so apps
+	only pass background colors and the package derives icon/text brightness.
+- Prevent automatic enablement of edge-to-edge on Android 14 and below during
+	initialization; Android 15+ (OS-enforced) is still respected.
+- Example and test apps: removed manual enable/disable toggle, improved
+	theme controls, and tidied example documentation.
+
 ## 0.1.0-dev.5 - 2025-08-28
-- Added `doc/getting_started.md` documenting initialization, APIs and the
-	`routeObserver` requirement for automatic per-route style restoration.
-- Added `example/README.md` so the example shows up on pub.dev and documents
-	example usage and entry points.
-- Cleaned up example and app comments to clarify `navigatorObservers` usage.
+ - Added `doc/getting_started.md` documenting initialization, APIs and the
+		`routeObserver` requirement for automatic per-route style restoration.
+ - Added `example/README.md` so the example shows up on pub.dev and documents
+		example usage and entry points.
+ - Cleaned up example and app comments to clarify `navigatorObservers` usage.
 
 ## 0.1.0-dev.4 - 2025-08-27
 - Added "Deep Customize" controls to the example app allowing separate control of:

@@ -3,11 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:edge_to_edge_system_ui/edge_to_edge_system_ui.dart';
 import 'home_page.dart';
-
-// App-wide theme mode notifier (Auto/System, Light, Dark)
-final ValueNotifier<ThemeMode> appThemeModeNotifier = ValueNotifier(
-  ThemeMode.system,
-);
+import 'app_state.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -68,8 +64,13 @@ class MyKotlinApp extends StatelessWidget {
           // receive push/pop lifecycle events. This single line is required
           // for the plugin's per-route automatic style restoration to work.
           navigatorObservers: [routeObserver],
+          // Explicitly avoid auto-enabling edge-to-edge on app startup for
+          // Android 14 and below. The package will respect OS-enforced
+          // edge-to-edge on Android 15+. Call
+          // `EdgeToEdgeSystemUIKotlin.instance.enableEdgeToEdge()` from your
+          // app when you want to enable it on older Android releases.
           home: const KotlinSystemUIWrapper(
-            enableEdgeToEdge: true,
+            enableEdgeToEdge: false,
             enforceContrast: true,
             child: KotlinHomePage(),
           ),
