@@ -63,8 +63,15 @@
     
 <section class="desc markdown">
   <p>Initialize the plugin and cache a quick snapshot of supported/enabled.</p>
-<p>This method must be called before using other methods in this class.
-It retrieves the current edge-to-edge support and enabled state from the native plugin.</p>
+<p>Call this early during app startup (for example in <code>main()</code> before
+<code>runApp</code>) to ensure the plugin's cached properties such as
+<a href="../../edge_to_edge_system_ui_kotlin/EdgeToEdgeSystemUIKotlin/isEdgeToEdgeSupported.html">isEdgeToEdgeSupported</a>, <a href="../../edge_to_edge_system_ui_kotlin/EdgeToEdgeSystemUIKotlin/isEdgeToEdgeEnabled.html">isEdgeToEdgeEnabled</a>, and
+<a href="../../edge_to_edge_system_ui_kotlin/EdgeToEdgeSystemUIKotlin/isEdgeToEdgeEnforcedBySystem.html">isEdgeToEdgeEnforcedBySystem</a> are populated. This method queries the
+native Kotlin implementation via the method channel and stores a local
+snapshot used by convenience helpers in this class.</p>
+<p>Errors from the platform are propagated as <a href="https://api.flutter.dev/flutter/services/PlatformException-class.html">PlatformException</a>. If the
+plugin is not available the returned map may be null and the method
+will return without mutating state.</p>
 </section>
 
 
@@ -116,7 +123,7 @@ It retrieves the current edge-to-edge support and enabled state from the native 
 <footer>
   <span class="no-break">
     edge_to_edge_system_ui
-      0.1.0-dev.4
+      0.1.0-dev.5
   </span>
   
 </footer>

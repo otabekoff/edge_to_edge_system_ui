@@ -231,6 +231,19 @@ platform details.
 
 </dd>
 
+        <dt id="pushStyleForRoute" class="callable">
+  <span class="name"><a href="../edge_to_edge_system_ui_kotlin/EdgeToEdgeSystemUIKotlin/pushStyleForRoute.html">pushStyleForRoute</a></span><span class="signature">(<wbr><span class="parameter" id="pushStyleForRoute-param-context"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/widgets/BuildContext-class.html">BuildContext</a></span> <span class="parameter-name">context</span>, {</span><span class="parameter" id="pushStyleForRoute-param-statusBarColor"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-ui/Color-class.html">Color</a>?</span> <span class="parameter-name">statusBarColor</span>, </span><span class="parameter" id="pushStyleForRoute-param-navigationBarColor"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-ui/Color-class.html">Color</a>?</span> <span class="parameter-name">navigationBarColor</span>, </span><span class="parameter" id="pushStyleForRoute-param-statusBarIconBrightness"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-ui/Brightness.html">Brightness</a>?</span> <span class="parameter-name">statusBarIconBrightness</span>, </span><span class="parameter" id="pushStyleForRoute-param-navigationBarIconBrightness"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-ui/Brightness.html">Brightness</a>?</span> <span class="parameter-name">navigationBarIconBrightness</span></span>})
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Apply a system UI style associated with the <a href="https://api.flutter.dev/flutter/widgets/ModalRoute-class.html">ModalRoute</a> for <code>context</code>.
+  
+
+</dd>
+
         <dt id="setDarkSystemUI" class="callable">
   <span class="name"><a href="../edge_to_edge_system_ui_kotlin/EdgeToEdgeSystemUIKotlin/setDarkSystemUI.html">setDarkSystemUI</a></span><span class="signature">(<wbr>{<span class="parameter" id="setDarkSystemUI-param-transparent"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">transparent</span> = <span class="default-value">false</span></span>})
     <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
@@ -279,6 +292,22 @@ platform details.
 </dt>
 <dd>
   Apply colors and appearance to the status and navigation bars.
+  
+
+</dd>
+
+        <dt id="setSystemUIStyleForColors" class="callable">
+  <span class="name"><a href="../edge_to_edge_system_ui_kotlin/EdgeToEdgeSystemUIKotlin/setSystemUIStyleForColors.html">setSystemUIStyleForColors</a></span><span class="signature">(<wbr>{<span class="parameter" id="setSystemUIStyleForColors-param-statusBarColor"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-ui/Color-class.html">Color</a></span> <span class="parameter-name">statusBarColor</span>, </span><span class="parameter" id="setSystemUIStyleForColors-param-navigationBarColor"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-ui/Color-class.html">Color</a></span> <span class="parameter-name">navigationBarColor</span></span>})
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Convenience helper: provide only background <a href="https://api.flutter.dev/flutter/dart-ui/Color-class.html">Color</a>s and let the package
+compute an appropriate icon/text <a href="https://api.flutter.dev/flutter/dart-ui/Brightness.html">Brightness</a> automatically using
+luminance. Callers who don't want to compute brightness themselves can
+use this method.
   
 
 </dd>
@@ -376,7 +405,7 @@ platform details.
 <footer>
   <span class="no-break">
     edge_to_edge_system_ui
-      0.1.0-dev.4
+      0.1.0-dev.5
   </span>
   
 </footer>

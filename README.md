@@ -47,6 +47,26 @@ print('Navigation bar height: ${info.navigationBarsHeight} dp');
 
 See `example/` for a runnable demo.
 
+## Navigator observer requirement
+
+To enable automatic per-route style restoration (so the plugin can restore
+previous system UI settings when a route is popped) your app must register
+the package-provided `routeObserver` on the top-level `MaterialApp` (or the
+root `Navigator`) using the `navigatorObservers` parameter. This is a single
+explicit line added to your `MaterialApp`:
+
+```dart
+MaterialApp(
+  // ... other properties ...
+  navigatorObservers: [routeObserver],
+)
+```
+
+This is required because route lifecycle callbacks are delivered only to
+observers registered on the same `Navigator` that owns the route. Registering
+the observer ensures the package's `RouteAware` listeners receive push/pop
+notifications and can automatically reapply or restore styles.
+
 Publishing
 - Update `publish_to` in `pubspec.yaml` to point to `https://pub.dev`.
 - Run `flutter pub publish --dry-run` and `flutter pub publish` when ready.
@@ -55,8 +75,7 @@ Notes
 - The plugin only implements Android in Kotlin currently. iOS and other platforms are no-ops.
 - The plugin returns inset sizes in logical pixels (dp) to match Flutter's `MediaQuery`.
 
-Changelog
----------
+## Changelog
 
 See `CHANGELOG.md` for recent changes and version history.
 

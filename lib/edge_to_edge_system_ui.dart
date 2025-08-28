@@ -1,3 +1,4 @@
+// edge_to_edge_system_ui.dart
 /// Edge-to-edge system UI utilities for Android.
 ///
 /// Provides a small, typed Dart API backed by a Kotlin plugin to query

@@ -1,7 +1,76 @@
+// edge_to_edge_system_ui_kotlin.dart
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'system_info.dart';
+
+/// A shared [RouteObserver] exported by the package.
+///
+/// Usage: register this observer on your app's top-level [MaterialApp] (or
+/// on the Navigator you want the plugin to track) so the package's
+/// RouteAware listeners receive push/pop lifecycle callbacks.
+///
+/// Example:
+///
+/// ```dart
+/// MaterialApp(
+///   // ...
+///   navigatorObservers: [routeObserver],
+/// )
+/// ```
+///
+/// Why this is required: the plugin attaches `RouteAware` listeners to the
+/// `Route` associated with a given BuildContext so it can automatically
+/// restore previously-applied system UI styles when a route is popped. Those
+/// notifications are only delivered to observers that were registered on the
+/// same [Navigator] instance that owns the route. Registering this observer
+/// on your app's root navigator is the simplest, most robust way to ensure
+/// the plugin receives lifecycle events across typical apps.
+final RouteObserver<ModalRoute<void>> routeObserver =
+    RouteObserver<ModalRoute<void>>();
+
+// Internal representation of a system UI style snapshot.
+class _SystemUiStyle {
+  final int statusBarColor;
+  final int navigationBarColor;
+  final bool statusBarLight;
+  final bool navigationBarLight;
+
+  _SystemUiStyle({
+    required this.statusBarColor,
+    required this.navigationBarColor,
+    required this.statusBarLight,
+    required this.navigationBarLight,
+  });
+}
+
+// (Navigator observer class removed; plugin uses routeObserver + RouteAware listeners)
+
+class _RouteStyleListener with RouteAware {
+  final Route<dynamic> route;
+  final EdgeToEdgeSystemUIKotlin plugin;
+
+  _RouteStyleListener(this.route, this.plugin);
+
+  @override
+  void didPopNext() {
+    // Not used here.
+  }
+
+  @override
+  void didPop() {
+    // When the associated route is popped, ask the plugin to restore
+    plugin._onRoutePopped();
+    // Unsubscribe
+    routeObserver.unsubscribe(this);
+  }
+
+  @override
+  void didPush() {}
+
+  @override
+  void didPushNext() {}
+}
 
 /// A Dart wrapper around the native Kotlin plugin for controlling Edge-to-Edge
 /// system UI on Android.
@@ -44,8 +113,17 @@ class EdgeToEdgeSystemUIKotlin {
 
   /// Initialize the plugin and cache a quick snapshot of supported/enabled.
   ///
-  /// This method must be called before using other methods in this class.
-  /// It retrieves the current edge-to-edge support and enabled state from the native plugin.
+  ///
+  /// Call this early during app startup (for example in `main()` before
+  /// `runApp`) to ensure the plugin's cached properties such as
+  /// [isEdgeToEdgeSupported], [isEdgeToEdgeEnabled], and
+  /// [isEdgeToEdgeEnforcedBySystem] are populated. This method queries the
+  /// native Kotlin implementation via the method channel and stores a local
+  /// snapshot used by convenience helpers in this class.
+  ///
+  /// Errors from the platform are propagated as [PlatformException]. If the
+  /// plugin is not available the returned map may be null and the method
+  /// will return without mutating state.
   Future<void> initialize() async {
     final map = await _channel.invokeMapMethod<String, dynamic>('initialize');
     if (map == null) return;
@@ -68,8 +146,10 @@ class EdgeToEdgeSystemUIKotlin {
   /// Returns a typed [SystemInfo] object describing system insets and
   /// platform details.
   ///
-  /// Returns a [SystemInfo] object containing details about the system UI insets,
-  /// Android version, and other platform-specific information.
+  /// The returned [SystemInfo] contains the status/navigation bar heights
+  /// (in logical pixels), Android API level (when available), and flags such
+  /// as whether edge-to-edge is supported and currently enabled. Use this
+  /// to adapt UI layout or feature gating in your app.
   Future<SystemInfo> getSystemInfo() async {
     final map =
         await _channel.invokeMapMethod<String, dynamic>('getSystemInfo');
@@ -79,7 +159,14 @@ class EdgeToEdgeSystemUIKotlin {
 
   /// Enable edge-to-edge mode on the device (Android).
   ///
-  /// This method makes the app content extend behind the system bars (status and navigation bars).
+  /// When enabled, app content will render edge-to-edge (behind the status
+  /// and navigation bars). The plugin will attempt to set the appropriate
+  /// window flags and notify the native implementation to update system
+  /// insets. On success this method updates [isEdgeToEdgeEnabled].
+  ///
+  /// Returns `true` when the native platform successfully changed the
+  /// edge-to-edge state. Callers should refresh any layout or insets after a
+  /// successful transition (for example by re-reading [getSystemInfo]).
   Future<bool> enableEdgeToEdge() async {
     try {
       final res = await _channel.invokeMethod<bool>('enable');
@@ -96,8 +183,11 @@ class EdgeToEdgeSystemUIKotlin {
 
   /// Disable edge-to-edge mode on the device (Android).
   ///
-  /// This method restores the default system UI behavior, where the app content
-  /// does not extend behind the system bars.
+  /// Restores default window behavior so app content no longer extends under
+  /// system bars. On success [isEdgeToEdgeEnabled] will be updated to `false`.
+  ///
+  /// Returns `true` when the native platform successfully changed the
+  /// edge-to-edge state.
   Future<bool> disableEdgeToEdge() async {
     try {
       final res = await _channel.invokeMethod<bool>('disable');
@@ -116,8 +206,19 @@ class EdgeToEdgeSystemUIKotlin {
   ///
   /// Colors are ARGB integers (same format as `Color.value`).
   ///
-  /// [statusBarColor] and [navigationBarColor] are ARGB integers representing the colors.
-  /// [statusBarLight] and [navigationBarLight] determine whether the icons are light or dark.
+  /// Parameters:
+  /// - [statusBarColor]: ARGB color value for the status bar background.
+  /// - [navigationBarColor]: ARGB color value for the navigation bar background.
+  /// - [statusBarLight]: when `true` the status bar content (icons/text)
+  ///   will be rendered light; when `false` dark content is used. Note that
+  ///   platform semantics may invert this flag depending on the Android API
+  ///   level and the plugin will convert booleans to platform-appropriate
+  ///   calls internally.
+  /// - [navigationBarLight]: same semantics as [statusBarLight] but for the
+  ///   navigation bar.
+  ///
+  /// This is a low-level API; higher-level convenience methods are provided
+  /// that accept Flutter [Color]s or compute icon brightness automatically.
   Future<void> setSystemUIStyle({
     required int statusBarColor,
     required int navigationBarColor,
@@ -130,6 +231,168 @@ class EdgeToEdgeSystemUIKotlin {
       'statusBarLight': statusBarLight,
       'navigationBarLight': navigationBarLight,
     });
+  }
+
+  // Internal stack to remember styles applied by the app/plugin so we can
+  // restore previous styles when routes are popped.
+  final List<_SystemUiStyle> _styleStack = [];
+
+  // Track listeners per route so we can unsubscribe when restored.
+  final Map<Route<dynamic>, _RouteStyleListener> _routeListeners = {};
+
+  // Apply and push a style to the internal stack. If [push] is false, the
+  // style will be applied but not pushed (transient).
+  // Internal helper: apply a style and optionally push it on the stack.
+  // This is private to avoid exposing the private [_SystemUiStyle] in a
+  // public API surface.
+  Future<void> _applyAndPushStyle(_SystemUiStyle style,
+      {bool push = true}) async {
+    if (push) _styleStack.add(style);
+    await setSystemUIStyle(
+      statusBarColor: style.statusBarColor,
+      navigationBarColor: style.navigationBarColor,
+      statusBarLight: style.statusBarLight,
+      navigationBarLight: style.navigationBarLight,
+    );
+  }
+
+  /// Apply a system UI style associated with the [ModalRoute] for [context].
+  ///
+  /// The plugin will automatically restore the previous style when that
+  /// route is popped. This keeps route lifecycle handling inside the package
+  /// instead of requiring every page to implement [RouteAware].
+  ///
+  /// How it works:
+  /// - If this is the first pushed style a base snapshot is captured from the
+  ///   current theme and saved on the internal style stack. The base snapshot
+  ///   is not applied immediately — the merged style is applied next.
+  /// - Missing parameters are merged with the last applied style (or base
+  ///   snapshot) so partial updates (for example changing only the
+  ///   navigation bar color) are supported.
+  /// - If both colors and explicit brightness flags are omitted, the method
+  ///   will return without changing anything (so pages that do not set any
+  ///   style won't affect the existing system UI state).
+  ///
+  /// Brightness resolution order:
+  /// 1. Explicit [statusBarIconBrightness]/[navigationBarIconBrightness] (if supplied).
+  /// 2. Brightness derived from the provided color's luminance (if brightness
+  ///    args are omitted).
+  /// 3. Previously-applied style on the stack.
+  ///
+  /// IMPORTANT: For automatic restoration to work the app must register the
+  /// package-provided `routeObserver` on the `MaterialApp` (see
+  /// `routeObserver` documentation and README). Example:
+  ///
+  /// ```dart
+  /// MaterialApp(navigatorObservers: [routeObserver], ...)
+  /// ```
+  ///
+  /// Parameters are optional; omit an argument to inherit from the base style.
+  Future<void> pushStyleForRoute(
+    BuildContext context, {
+    Color? statusBarColor,
+    Color? navigationBarColor,
+    Brightness? statusBarIconBrightness,
+    Brightness? navigationBarIconBrightness,
+  }) async {
+    final route = ModalRoute.of(context);
+    if (route == null) return;
+
+    // If caller didn't provide any style, don't push — this avoids
+    // reapplying a page's (non-existent) style when navigating back.
+    if (statusBarColor == null &&
+        navigationBarColor == null &&
+        statusBarIconBrightness == null &&
+        navigationBarIconBrightness == null) {
+      return;
+    }
+
+    // Start from the last applied style if present so we can merge partial
+    // updates. If there are no styles on the stack, capture a base style
+    // derived from the current theme and push it (saved only) so we can
+    // restore it when the newly pushed style is popped. We don't apply the
+    // base immediately because the merged style will be applied next.
+    _SystemUiStyle base;
+    if (_styleStack.isNotEmpty) {
+      base = _styleStack.last;
+    } else {
+      final brightness = Theme.of(context).brightness;
+      final isDark = brightness == Brightness.dark;
+      base = _SystemUiStyle(
+        statusBarColor: (isDark ? Colors.black : Colors.white).toARGB32(),
+        navigationBarColor: (isDark ? Colors.black : Colors.white).toARGB32(),
+        statusBarLight: isDark,
+        navigationBarLight: isDark,
+      );
+      // Save base onto stack so it will be restored after the pushed style is popped.
+      _styleStack.add(base);
+    }
+
+    // Resolve colors
+    final resolvedStatusColor = statusBarColor ?? Color(base.statusBarColor);
+    final resolvedNavColor =
+        navigationBarColor ?? Color(base.navigationBarColor);
+
+    // If caller didn't provide explicit brightness, derive it from color luminance.
+    final derivedStatusBrightness = resolvedStatusColor.computeLuminance() > 0.5
+        ? Brightness.dark
+        : Brightness.light;
+    final derivedNavBrightness = resolvedNavColor.computeLuminance() > 0.5
+        ? Brightness.dark
+        : Brightness.light;
+
+    final merged = _SystemUiStyle(
+      statusBarColor: resolvedStatusColor.toARGB32(),
+      navigationBarColor: resolvedNavColor.toARGB32(),
+      statusBarLight: statusBarIconBrightness == null
+          ? (base.statusBarLight)
+          : (statusBarIconBrightness == Brightness.light),
+      navigationBarLight: navigationBarIconBrightness == null
+          ? (base.navigationBarLight)
+          : (navigationBarIconBrightness == Brightness.light),
+    );
+
+    // If either brightness was not provided, replace with derived brightness
+    // computed from the resolved color. This keeps explicit args highest priority,
+    // then color-derived behavior, then the previously applied base style.
+    final finalMerged = _SystemUiStyle(
+      statusBarColor: merged.statusBarColor,
+      navigationBarColor: merged.navigationBarColor,
+      statusBarLight: statusBarIconBrightness == null
+          ? (derivedStatusBrightness == Brightness.light)
+          : merged.statusBarLight,
+      navigationBarLight: navigationBarIconBrightness == null
+          ? (derivedNavBrightness == Brightness.light)
+          : merged.navigationBarLight,
+    );
+
+    // Apply and push to stack
+    await _applyAndPushStyle(finalMerged, push: true);
+
+    // Subscribe a listener that will restore when the route is popped.
+    final listener = _RouteStyleListener(route, this);
+    _routeListeners[route] = listener;
+    routeObserver.subscribe(listener, route);
+  }
+
+  // Pop the last style and reapply the previous one (if any).
+  Future<void> _onRoutePopped() async {
+    if (_styleStack.isNotEmpty) {
+      _styleStack.removeLast();
+    }
+    if (_styleStack.isNotEmpty) {
+      final s = _styleStack.last;
+      await setSystemUIStyle(
+        statusBarColor: s.statusBarColor,
+        navigationBarColor: s.navigationBarColor,
+        statusBarLight: s.statusBarLight,
+        navigationBarLight: s.navigationBarLight,
+      );
+    } else {
+      // No styles left: fall back to theme mapping if possible.
+      // We can't read Theme.of(context) here; caller should call
+      // setSystemUIForTheme if needed. Do nothing here.
+    }
   }
 
   /// Convenience method to set light system UI with optional transparency.
@@ -175,6 +438,35 @@ class EdgeToEdgeSystemUIKotlin {
       navigationBarColor: navigationBarColor.toARGB32(),
       statusBarLight: statusBarIconBrightness == Brightness.light,
       navigationBarLight: navigationBarIconBrightness == Brightness.light,
+    );
+  }
+
+  /// Convenience helper: provide only background [Color]s and let the package
+  /// compute an appropriate icon/text [Brightness] automatically using
+  /// luminance. Callers who don't want to compute brightness themselves can
+  /// use this method.
+  ///
+  /// This helper is the recommended API for most apps: pass Flutter
+  /// `Color` objects for the status and navigation background and the
+  /// package will compute an appropriate icon/text brightness using
+  /// `Color.computeLuminance()` (simple and robust heuristic). This avoids
+  /// callers duplicating luminance logic and keeps appearance decisions
+  /// centralized in one place.
+  Future<void> setSystemUIStyleForColors({
+    required Color statusBarColor,
+    required Color navigationBarColor,
+  }) async {
+    final statusIconBrightness = statusBarColor.computeLuminance() > 0.5
+        ? Brightness.dark
+        : Brightness.light;
+    final navIconBrightness = navigationBarColor.computeLuminance() > 0.5
+        ? Brightness.dark
+        : Brightness.light;
+    await setSystemUIStyleWithBrightness(
+      statusBarColor: statusBarColor,
+      navigationBarColor: navigationBarColor,
+      statusBarIconBrightness: statusIconBrightness,
+      navigationBarIconBrightness: navIconBrightness,
     );
   }
 
@@ -350,48 +642,11 @@ class KotlinEdgeToEdgeSafeArea extends StatelessWidget {
   }
 }
 
-/// Utility function to get Android version name from API level.
-///
-/// Returns a human-friendly Android name for well-known API levels and falls
-/// back to a generic string for unknown or future versions.
-String whenSdk(int apiLevel) {
-  switch (apiLevel) {
-    case 36:
-      return '16 Baklava';
-    case 35:
-      return '15 Vanilla Ice Cream';
-    case 34:
-      return '14 Upside Down Cake';
-    case 33:
-      return '13 Tiramisu';
-    case 32:
-      return '12L Snow Cone V2';
-    case 31:
-      return '12 Snow Cone';
-    case 30:
-      return '11 Red Velvet Cake';
-    case 29:
-      return '10 Quince Tart';
-    case 28:
-      return '9 Pie';
-    case 27:
-      return '8.1 Oreo MR1';
-    case 26:
-      return '8.0 Oreo';
-    case 25:
-      return '7.1 Nougat MR1';
-    case 24:
-      return '7.0 Nougat';
-    case 23:
-      return '6.0 Marshmallow';
-    case 22:
-      return '5.1 Lollipop MR1';
-    case 21:
-      return '5.0 Lollipop';
-    default:
-      if (apiLevel > 36) {
-        return 'Android (Unknown future version, API $apiLevel)';
-      }
-      return 'Android API $apiLevel';
-  }
+// Compatibility helper: convert a Color to ARGB int for plugin calls
+// Avoid using the deprecated `.value` getter; compose ARGB explicitly.
+// Reserved helper for future use. Keep it available without analyzer warnings.
+// ignore: unused_element
+int _colorToInt(Color c) {
+  // Use the modern API when available.
+  return c.toARGB32();
 }

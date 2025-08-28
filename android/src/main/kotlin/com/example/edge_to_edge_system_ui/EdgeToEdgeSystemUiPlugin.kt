@@ -1,3 +1,4 @@
+// EdgeToEdgeSystemUiPlugin.kt
 package com.example.edge_to_edge_system_ui
 
 import android.app.Activity

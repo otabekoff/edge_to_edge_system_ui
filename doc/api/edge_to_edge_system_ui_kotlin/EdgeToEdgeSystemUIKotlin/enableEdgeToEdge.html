@@ -63,7 +63,13 @@
     
 <section class="desc markdown">
   <p>Enable edge-to-edge mode on the device (Android).</p>
-<p>This method makes the app content extend behind the system bars (status and navigation bars).</p>
+<p>When enabled, app content will render edge-to-edge (behind the status
+and navigation bars). The plugin will attempt to set the appropriate
+window flags and notify the native implementation to update system
+insets. On success this method updates <a href="../../edge_to_edge_system_ui_kotlin/EdgeToEdgeSystemUIKotlin/isEdgeToEdgeEnabled.html">isEdgeToEdgeEnabled</a>.</p>
+<p>Returns <code>true</code> when the native platform successfully changed the
+edge-to-edge state. Callers should refresh any layout or insets after a
+successful transition (for example by re-reading <a href="../../edge_to_edge_system_ui_kotlin/EdgeToEdgeSystemUIKotlin/getSystemInfo.html">getSystemInfo</a>).</p>
 </section>
 
 
@@ -110,7 +116,7 @@
 <footer>
   <span class="no-break">
     edge_to_edge_system_ui
-      0.1.0-dev.4
+      0.1.0-dev.5
   </span>
   
 </footer>

@@ -81,6 +81,21 @@ final info = await EdgeToEdgeSystemUIKotlin.instance.getSystemInfo();
 print('Navigation bar height: ${info.navigationBarsHeight} dp');
 </code></pre>
 <p>See <code>example/</code> for a runnable demo.</p>
+<h2 id="navigator-observer-requirement">Navigator observer requirement</h2>
+<p>To enable automatic per-route style restoration (so the plugin can restore
+previous system UI settings when a route is popped) your app must register
+the package-provided <code>routeObserver</code> on the top-level <code>MaterialApp</code> (or the
+root <code>Navigator</code>) using the <code>navigatorObservers</code> parameter. This is a single
+explicit line added to your <code>MaterialApp</code>:</p>
+<pre class="language-dart"><code class="language-dart">MaterialApp(
+  // ... other properties ...
+  navigatorObservers: [routeObserver],
+)
+</code></pre>
+<p>This is required because route lifecycle callbacks are delivered only to
+observers registered on the same <code>Navigator</code> that owns the route. Registering
+the observer ensures the package's <code>RouteAware</code> listeners receive push/pop
+notifications and can automatically reapply or restore styles.</p>
 <p>Publishing</p>
 <ul>
 <li>Update <code>publish_to</code> in <code>pubspec.yaml</code> to point to <code>https://pub.dev</code>.</li>
@@ -215,7 +230,7 @@ This is a development release containing example improvements and bugfixes:
 <footer>
   <span class="no-break">
     edge_to_edge_system_ui
-      0.1.0-dev.4
+      0.1.0-dev.5
   </span>
   
 </footer>

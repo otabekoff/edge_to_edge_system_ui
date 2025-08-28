@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.0-dev.5 - 2025-08-28
+- Added `doc/getting_started.md` documenting initialization, APIs and the
+	`routeObserver` requirement for automatic per-route style restoration.
+- Added `example/README.md` so the example shows up on pub.dev and documents
+	example usage and entry points.
+- Cleaned up example and app comments to clarify `navigatorObservers` usage.
+
 ## 0.1.0-dev.4 - 2025-08-27
 - Added "Deep Customize" controls to the example app allowing separate control of:
 	- status bar background color

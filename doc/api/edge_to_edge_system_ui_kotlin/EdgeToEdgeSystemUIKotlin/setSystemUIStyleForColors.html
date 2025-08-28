@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
-  <meta name="description" content="API docs for the getSystemInfo method from the EdgeToEdgeSystemUIKotlin class, for the Dart programming language.">
-  <title>getSystemInfo method - EdgeToEdgeSystemUIKotlin class - edge_to_edge_system_ui_kotlin library - Dart API</title>
+  <meta name="description" content="API docs for the setSystemUIStyleForColors method from the EdgeToEdgeSystemUIKotlin class, for the Dart programming language.">
+  <title>setSystemUIStyleForColors method - EdgeToEdgeSystemUIKotlin class - edge_to_edge_system_ui_kotlin library - Dart API</title>
 
 
   
@@ -27,9 +27,9 @@
     <li><a href="../../index.html">edge_to_edge_system_ui</a></li>
     <li><a href="../../edge_to_edge_system_ui_kotlin/">edge_to_edge_system_ui_kotlin.dart</a></li>
     <li><a href="../../edge_to_edge_system_ui_kotlin/EdgeToEdgeSystemUIKotlin-class.html">EdgeToEdgeSystemUIKotlin</a></li>
-    <li class="self-crumb">getSystemInfo method</li>
+    <li class="self-crumb">setSystemUIStyleForColors method</li>
   </ol>
-  <div class="self-name">getSystemInfo</div>
+  <div class="self-name">setSystemUIStyleForColors</div>
   <form class="search navbar-right" role="search">
     <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
   </form>
@@ -49,36 +49,53 @@
     data-above-sidebar="edge_to_edge_system_ui_kotlin&#47;EdgeToEdgeSystemUIKotlin-class-sidebar.html"
     data-below-sidebar="">
     <div>
-<h1><span class="kind-method">getSystemInfo</span> method 
+<h1><span class="kind-method">setSystemUIStyleForColors</span> method 
 </h1></div>
 
     <section class="multi-line-signature">
       
-<span class="returntype"><a href="https://api.flutter.dev/flutter/dart-core/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../../system_info/SystemInfo-class.html">SystemInfo</a></span>&gt;</span></span>
-<span class="name ">getSystemInfo</span>(<wbr>)
+<span class="returntype"><a href="https://api.flutter.dev/flutter/dart-core/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+<span class="name ">setSystemUIStyleForColors</span>(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="setSystemUIStyleForColors-param-statusBarColor"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-ui/Color-class.html">Color</a></span> <span class="parameter-name">statusBarColor</span>, </span></li>
+<li><span class="parameter" id="setSystemUIStyleForColors-param-navigationBarColor"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-ui/Color-class.html">Color</a></span> <span class="parameter-name">navigationBarColor</span>, </span></li>
+</ol>})
 
       
 
     </section>
     
 <section class="desc markdown">
-  <p>Returns a typed <a href="../../system_info/SystemInfo-class.html">SystemInfo</a> object describing system insets and
-platform details.</p>
-<p>The returned <a href="../../system_info/SystemInfo-class.html">SystemInfo</a> contains the status/navigation bar heights
-(in logical pixels), Android API level (when available), and flags such
-as whether edge-to-edge is supported and currently enabled. Use this
-to adapt UI layout or feature gating in your app.</p>
+  <p>Convenience helper: provide only background <a href="https://api.flutter.dev/flutter/dart-ui/Color-class.html">Color</a>s and let the package
+compute an appropriate icon/text <a href="https://api.flutter.dev/flutter/dart-ui/Brightness.html">Brightness</a> automatically using
+luminance. Callers who don't want to compute brightness themselves can
+use this method.</p>
+<p>This helper is the recommended API for most apps: pass Flutter
+<code>Color</code> objects for the status and navigation background and the
+package will compute an appropriate icon/text brightness using
+<code>Color.computeLuminance()</code> (simple and robust heuristic). This avoids
+callers duplicating luminance logic and keeps appearance decisions
+centralized in one place.</p>
 </section>
 
 
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Future&lt;SystemInfo&gt; getSystemInfo() async {
-  final map =
-      await _channel.invokeMapMethod&lt;String, dynamic&gt;(&#39;getSystemInfo&#39;);
-  return SystemInfo.fromMap(
-      map?.cast&lt;String, dynamic&gt;() ?? &lt;String, dynamic&gt;{});
+  <pre class="language-dart"><code class="language-dart">Future&lt;void&gt; setSystemUIStyleForColors({
+  required Color statusBarColor,
+  required Color navigationBarColor,
+}) async {
+  final statusIconBrightness = statusBarColor.computeLuminance() &gt; 0.5
+      ? Brightness.dark
+      : Brightness.light;
+  final navIconBrightness = navigationBarColor.computeLuminance() &gt; 0.5
+      ? Brightness.dark
+      : Brightness.light;
+  await setSystemUIStyleWithBrightness(
+    statusBarColor: statusBarColor,
+    navigationBarColor: navigationBarColor,
+    statusBarIconBrightness: statusIconBrightness,
+    navigationBarIconBrightness: navIconBrightness,
+  );
 }</code></pre>
 </section>
 
@@ -95,7 +112,7 @@ to adapt UI layout or feature gating in your app.</p>
     <li><a href="../../index.html">edge_to_edge_system_ui</a></li>
     <li><a href="../../edge_to_edge_system_ui_kotlin/">edge_to_edge_system_ui_kotlin</a></li>
     <li><a href="../../edge_to_edge_system_ui_kotlin/EdgeToEdgeSystemUIKotlin-class.html">EdgeToEdgeSystemUIKotlin</a></li>
-    <li class="self-crumb">getSystemInfo method</li>
+    <li class="self-crumb">setSystemUIStyleForColors method</li>
 </ol>
 
     <h5>EdgeToEdgeSystemUIKotlin class</h5>

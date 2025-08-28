@@ -1,15 +1,41 @@
-Publishing checklist
+## Publishing Checklist
 
-1. Update `pubspec.yaml`: set `publish_to: https://pub.dev` and verify metadata (homepage, repository).
-2. Run `flutter pub publish --dry-run` to validate.
-3. Run `flutter pub publish` to publish.
+1. **Update `pubspec.yaml`**
+    - Set `publish_to: https://pub.dev`
+    - Verify metadata: `homepage`, `repository`, etc.
+    - Bump the version and update the changelog.
 
-Testing locally
+2. **Validate Package**
+    - Run: `flutter pub publish --dry-run`
 
-- From package root, run `flutter pub get`.
-- To run the example: `cd example` then `flutter pub get` and `flutter run`.
+3. **Publish**
+    - Run: `flutter pub publish`
 
-Notes
+---
 
-- Ensure you bump the version and add changelog entry before publishing.
-- The plugin currently implements Android only.
+## Local Testing
+
+- Run `flutter pub get` from the package root.
+- To test the example:
+  1. `cd example`
+  2. `flutter pub get`
+  3. `flutter run`
+
+---
+
+## Notes
+
+- **Android only** is supported.
+- Document all changes in the changelog before publishing.
+
+---
+
+## Publishing Notes
+
+Before publishing:
+
+- Ensure `doc/getting_started.md` is present and current (included for pub.dev users).
+- Generate API docs with `dart doc` (output to `doc/api`).  
+  *Do not check generated docs into source control.*
+- Verify the example builds:  
+  `cd example && flutter pub get && flutter run`

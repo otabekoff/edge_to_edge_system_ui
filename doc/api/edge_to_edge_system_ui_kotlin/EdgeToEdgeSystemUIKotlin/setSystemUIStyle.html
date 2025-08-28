@@ -68,8 +68,20 @@
 <section class="desc markdown">
   <p>Apply colors and appearance to the status and navigation bars.</p>
 <p>Colors are ARGB integers (same format as <code>Color.value</code>).</p>
-<p><code>statusBarColor</code> and <code>navigationBarColor</code> are ARGB integers representing the colors.
-<code>statusBarLight</code> and <code>navigationBarLight</code> determine whether the icons are light or dark.</p>
+<p>Parameters:</p>
+<ul>
+<li><code>statusBarColor</code>: ARGB color value for the status bar background.</li>
+<li><code>navigationBarColor</code>: ARGB color value for the navigation bar background.</li>
+<li><code>statusBarLight</code>: when <code>true</code> the status bar content (icons/text)
+will be rendered light; when <code>false</code> dark content is used. Note that
+platform semantics may invert this flag depending on the Android API
+level and the plugin will convert booleans to platform-appropriate
+calls internally.</li>
+<li><code>navigationBarLight</code>: same semantics as <code>statusBarLight</code> but for the
+navigation bar.</li>
+</ul>
+<p>This is a low-level API; higher-level convenience methods are provided
+that accept Flutter <a href="https://api.flutter.dev/flutter/dart-ui/Color-class.html">Color</a>s or compute icon brightness automatically.</p>
 </section>
 
 
@@ -116,7 +128,7 @@
 <footer>
   <span class="no-break">
     edge_to_edge_system_ui
-      0.1.0-dev.4
+      0.1.0-dev.5
   </span>
   
 </footer>
